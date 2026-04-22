@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>California Boxing Wear — California Boxing Club</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;1,400&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body class="header-scroll-reveal">
+    <header class="top-bar" id="site-header">
+      <div class="top-bar__inner">
+        <button
+          type="button"
+          class="icon-btn top-bar__menu"
+          aria-expanded="false"
+          aria-controls="drawer"
+          aria-label="Меню"
+        >
+          <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3.75 5h16.5M3.75 12h16.5M3.75 19h16.5" />
+          </svg>
+        </button>
+        <div class="top-bar__actions">
+          <button type="button" class="icon-btn" aria-label="Поиск">
+            <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+          </button>
+          <a href="#" class="icon-btn" id="nav-favorites" aria-label="Избранное">
+            <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+            </svg>
+          </a>
+          <a href="#" class="icon-btn" aria-label="Корзина">
+            <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974a1.125 1.125 0 0 1 1.119 1.007Z" />
+            </svg>
+          </a>
+          <a href="#" class="icon-btn" aria-label="Личный кабинет">
+            <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="drawer" id="drawer" hidden>
+      <div class="drawer__backdrop" data-close-drawer tabindex="-1" aria-hidden="true"></div>
+      <nav class="drawer__panel" aria-label="Меню">
+        <a href="#catalog">Каталог</a>
+        <a href="#about">О клубе</a>
+        <a href="#footer">Контакты</a>
+      </nav>
+    </div>
+
+    <main class="page">
+      <section class="hero" id="top">
+        <div class="hero__media">
+          <img
+            src="images/hero.jpg"
+            alt=""
+            width="2400"
+            height="3000"
+            class="hero__img"
+            fetchpriority="high"
+          />
+          <div class="hero__overlay" aria-hidden="true"></div>
+        </div>
+        <div class="hero__content">
+          <h1 class="hero__title">California Boxing Wear</h1>
+          <a href="#catalog" class="hero__cta">
+            <span class="hero__cta-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+            </span>
+            <span>Смотреть каталог</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="catalog" id="catalog">
+        <div class="container container--wide">
+          <h2 class="catalog__heading">Каталог</h2>
+          <div class="catalog__filters" role="tablist" aria-label="Категории">
+            <button type="button" class="filter-chip is-active" data-filter="all" role="tab" aria-selected="true">Все</button>
+            <button type="button" class="filter-chip" data-filter="new" role="tab" aria-selected="false">Новинки</button>
+            <button type="button" class="filter-chip" data-filter="hoodies" role="tab" aria-selected="false">Худи</button>
+            <button type="button" class="filter-chip" data-filter="tshirts" role="tab" aria-selected="false">Футболки</button>
+            <button type="button" class="filter-chip" data-filter="shorts" role="tab" aria-selected="false">Шорты</button>
+            <button type="button" class="filter-chip" data-filter="suits" role="tab" aria-selected="false">Костюмы</button>
+            <button type="button" class="filter-chip" data-filter="accessories" role="tab" aria-selected="false">Аксессуары</button>
+          </div>
+
+          <div class="product-grid" id="product-grid">
+            <article class="product-card" data-product-id="tee-1" data-categories="tshirts new">
+              <div class="product-card__media">
+                <a href="product.html?id=tee-1" class="product-card__cover" aria-label="Футболка — страница товара"></a>
+                <img
+                  src="images/california7934.jpg"
+                  alt="Футболка California Boxing Club"
+                  width="620"
+                  height="968"
+                  class="product-card__img"
+                  fetchpriority="high"
+                />
+                <button type="button" class="product-card__bookmark" aria-label="В избранное" aria-pressed="false">
+                  <svg class="bookmark-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                  </svg>
+                </button>
+              </div>
+              <h3 class="product-card__name"><a href="product.html?id=tee-1" class="product-card__title-link">Футболка</a></h3>
+              <p class="product-card__price">5 990 ₽</p>
+            </article>
+            <article class="product-card" data-product-id="tee-2" data-categories="tshirts">
+              <div class="product-card__media">
+                <a href="product.html?id=tee-2" class="product-card__cover" aria-label="Футболка — страница товара"></a>
+                <img
+                  src="images/california8007.jpg"
+                  alt="Футболка California Boxing Club"
+                  width="620"
+                  height="968"
+                  class="product-card__img"
+                  loading="lazy"
+                />
+                <button type="button" class="product-card__bookmark" aria-label="В избранное" aria-pressed="false">
+                  <svg class="bookmark-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                  </svg>
+                </button>
+              </div>
+              <h3 class="product-card__name"><a href="product.html?id=tee-2" class="product-card__title-link">Футболка</a></h3>
+              <p class="product-card__price">5 990 ₽</p>
+            </article>
+            <article class="product-card" data-product-id="tee-3" data-categories="tshirts">
+              <div class="product-card__media">
+                <a href="product.html?id=tee-3" class="product-card__cover" aria-label="Футболка — страница товара"></a>
+                <img
+                  src="images/california7891.jpg"
+                  alt="Футболка California Boxing Club"
+                  width="620"
+                  height="968"
+                  class="product-card__img"
+                  loading="lazy"
+                />
+                <button type="button" class="product-card__bookmark" aria-label="В избранное" aria-pressed="false">
+                  <svg class="bookmark-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                  </svg>
+                </button>
+              </div>
+              <h3 class="product-card__name"><a href="product.html?id=tee-3" class="product-card__title-link">Футболка</a></h3>
+              <p class="product-card__price">4 490 ₽</p>
+            </article>
+            <article class="product-card" data-product-id="tee-4" data-categories="tshirts">
+              <div class="product-card__media">
+                <a href="product.html?id=tee-4" class="product-card__cover" aria-label="Футболка — страница товара"></a>
+                <img
+                  src="images/california8050.jpg"
+                  alt="Футболка California Boxing Club"
+                  width="620"
+                  height="968"
+                  class="product-card__img"
+                  loading="lazy"
+                />
+                <button type="button" class="product-card__bookmark" aria-label="В избранное" aria-pressed="false">
+                  <svg class="bookmark-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                  </svg>
+                </button>
+              </div>
+              <h3 class="product-card__name"><a href="product.html?id=tee-4" class="product-card__title-link">Футболка</a></h3>
+              <p class="product-card__price">4 490 ₽</p>
+            </article>
+            <article class="product-card" data-product-id="tee-5" data-categories="tshirts new">
+              <div class="product-card__media">
+                <a href="product.html?id=tee-5" class="product-card__cover" aria-label="Футболка — страница товара"></a>
+                <img
+                  src="images/california7945.jpg"
+                  alt="Футболка California Boxing Club"
+                  width="620"
+                  height="968"
+                  class="product-card__img"
+                  loading="lazy"
+                />
+                <button type="button" class="product-card__bookmark" aria-label="В избранное" aria-pressed="false">
+                  <svg class="bookmark-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                  </svg>
+                </button>
+              </div>
+              <h3 class="product-card__name"><a href="product.html?id=tee-5" class="product-card__title-link">Футболка</a></h3>
+              <p class="product-card__price">6 990 ₽</p>
+            </article>
+            <article class="product-card" data-product-id="tee-6" data-categories="tshirts">
+              <div class="product-card__media">
+                <a href="product.html?id=tee-6" class="product-card__cover" aria-label="Футболка — страница товара"></a>
+                <img
+                  src="images/california8029.jpg"
+                  alt="Футболка California Boxing Club"
+                  width="620"
+                  height="968"
+                  class="product-card__img"
+                  loading="lazy"
+                />
+                <button type="button" class="product-card__bookmark" aria-label="В избранное" aria-pressed="false">
+                  <svg class="bookmark-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                  </svg>
+                </button>
+              </div>
+              <h3 class="product-card__name"><a href="product.html?id=tee-6" class="product-card__title-link">Футболка</a></h3>
+              <p class="product-card__price">6 990 ₽</p>
+            </article>
+            <article class="product-card" data-product-id="hoodie-12000" data-categories="hoodies new">
+              <div class="product-card__media placeholder-checker">
+                <button type="button" class="product-card__bookmark" aria-label="В избранное" aria-pressed="false">
+                  <svg class="bookmark-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                  </svg>
+                </button>
+              </div>
+              <h3 class="product-card__name">Худи</h3>
+              <p class="product-card__price">12 000 ₽</p>
+            </article>
+            <article class="product-card" data-product-id="gloves-14999" data-categories="accessories">
+              <div class="product-card__media placeholder-checker">
+                <button type="button" class="product-card__bookmark" aria-label="В избранное" aria-pressed="false">
+                  <svg class="bookmark-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                  </svg>
+                </button>
+              </div>
+              <h3 class="product-card__name">Перчатки</h3>
+              <p class="product-card__price">14 999 ₽</p>
+            </article>
+            <article class="product-card" data-product-id="shorts-soon" data-categories="shorts">
+              <div class="product-card__media placeholder-checker">
+                <button type="button" class="product-card__bookmark" aria-label="В избранное" aria-pressed="false">
+                  <svg class="bookmark-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                  </svg>
+                </button>
+              </div>
+              <h3 class="product-card__name">Шорты</h3>
+              <p class="product-card__price">8 990 ₽</p>
+            </article>
+            <article class="product-card" data-product-id="suits-soon" data-categories="suits">
+              <div class="product-card__media placeholder-checker">
+                <button type="button" class="product-card__bookmark" aria-label="В избранное" aria-pressed="false">
+                  <svg class="bookmark-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                  </svg>
+                </button>
+              </div>
+              <h3 class="product-card__name">Костюмы</h3>
+              <p class="product-card__price">15 990 ₽</p>
+            </article>
+          </div>
+
+          <p class="catalog__more">
+            <!-- <button type="button" class="link-more" id="show-more">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Показать ещё
+            </button> -->
+          </p>
+        </div>
+      </section>
+
+      <section class="about" id="about">
+        <div class="container container--wide about__inner">
+          <div class="about__brand-block">
+            <img class="about__logo-img" src="images/logo-cbc.svg" width="446" height="263" alt="California Boxing Club" />
+            <div class="about__chips">
+              <a
+                class="chip chip--link"
+                href="https://yandex.ru/maps/?ll=37.531289%2C55.790231&amp;z=18&amp;pt=37.531289%2C55.790231%2Cpm2rdm"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M12 21s-8-4.5-8-11a8 8 0 0116 0c0 6.5-8 11-8 11z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                Москва, м. ЦСКА
+              </a>
+              <a href="tel:+79152102152" class="chip chip--link">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path
+                    d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.12.9.33 1.77.62 2.6a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.48-1.19a2 2 0 012.11-.45c.83.29 1.7.5 2.6.62A2 2 0 0122 16.92z"
+                  />
+                </svg>
+                +7 (915) 210 21 52
+              </a>
+            </div>
+          </div>
+          <div class="about__text-block">
+            <p class="about__lead">
+              California Boxing Club<br />
+              для профессионалов и любителей всех возрастов
+            </p>
+            <p class="about__quote">«Мы не разделяем по возрасту, полу и уровню подготовки»</p>
+            <a href="tel:+79152102152" class="btn btn--accent">Оставить заявку</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" id="footer">
+      <div class="container container--wide footer__grid">
+        <div class="footer__col">
+          <p class="footer__brand">California Boxing Club</p>
+          <p class="footer__phone"><a href="tel:+79152102152">+7 (915) 210 21 52</a></p>
+          <a
+            class="footer__address"
+            href="https://yandex.ru/maps/?ll=37.531289%2C55.790231&amp;z=18&amp;pt=37.531289%2C55.790231%2Cpm2rdm"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Москва, Ходынский б-р, д.4</a>
+        </div>
+        <div class="footer__col">
+          <ul class="footer__links footer__links--plain">
+            <li><a href="#catalog">Каталог</a></li>
+            <li><a href="#">Личный кабинет</a></li>
+            <li><a href="#footer">Контакты</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <ul class="footer__links footer__links--plain">
+            <li><a href="#">Доставка и оплата</a></li>
+            <li><a href="#">Поддержка</a></li>
+            <li><a href="#">Клуб в Москве</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <ul class="footer__links footer__links--legal">
+            <li><a href="#">Политика конфиденциальности</a></li>
+            <li><a href="#">Договор оферты</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/favorites.js" defer></script>
+    <script src="js/products-data.js" defer></script>
+    <script src="js/main.js" defer></script>
+  </body>
+</html>

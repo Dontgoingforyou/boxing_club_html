@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Футболка — 8 000 ₽ — California Boxing Wear</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;1,400&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body class="header-scroll-reveal">
+    <header class="top-bar" id="site-header">
+      <div class="top-bar__inner">
+        <button
+          type="button"
+          class="icon-btn top-bar__menu"
+          aria-expanded="false"
+          aria-controls="drawer"
+          aria-label="Меню"
+        >
+          <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3.75 5h16.5M3.75 12h16.5M3.75 19h16.5" />
+          </svg>
+        </button>
+        <div class="top-bar__actions">
+          <button type="button" class="icon-btn" aria-label="Поиск">
+            <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+          </button>
+          <a href="#" class="icon-btn" id="nav-favorites" aria-label="Избранное">
+            <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+            </svg>
+          </a>
+          <a href="#" class="icon-btn" aria-label="Корзина">
+            <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974a1.125 1.125 0 0 1 1.119 1.007Z" />
+            </svg>
+          </a>
+          <a href="#" class="icon-btn" aria-label="Личный кабинет">
+            <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="drawer" id="drawer" hidden>
+      <div class="drawer__backdrop" data-close-drawer tabindex="-1" aria-hidden="true"></div>
+      <nav class="drawer__panel" aria-label="Меню">
+        <a href="index.html">Главная</a>
+        <a href="index.html#catalog">Каталог</a>
+        <a href="index.html#about">О клубе</a>
+        <a href="index.html#footer">Контакты</a>
+      </nav>
+    </div>
+
+    <main class="page page--product">
+      <div class="container container--wide product-page">
+        <nav class="breadcrumbs" aria-label="Хлебные крошки">
+          <a href="index.html">Главная</a>
+          <span class="breadcrumbs__sep" aria-hidden="true">/</span>
+          <a href="index.html#catalog">Каталог</a>
+          <span class="breadcrumbs__sep" aria-hidden="true">/</span>
+          <span class="breadcrumbs__current">Футболка</span>
+        </nav>
+
+        <article class="product-detail" data-product-id="tee-cbc" style="opacity:0;pointer-events:none">
+          <div class="product-detail__gallery">
+            <div class="product-detail__main" id="product-main">
+              <button
+                type="button"
+                class="product-detail__nav product-detail__nav--prev"
+                id="product-gallery-prev"
+                aria-label="Предыдущее фото"
+              >
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                class="product-detail__nav product-detail__nav--next"
+                id="product-gallery-next"
+                aria-label="Следующее фото"
+              >
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+              <div class="product-detail__main-viewport" id="product-main-viewport">
+                <div class="product-detail__main-track" id="product-main-track">
+                  <div class="product-detail__main-slide">
+                    <img
+                      id="product-main-img"
+                      src=""
+                      alt="Футболка California Boxing Club"
+                      width="820"
+                      height="1024"
+                      class="product-detail__main-img"
+                    />
+                  </div>
+                  <div class="product-detail__main-slide">
+                    <img
+                      id="product-main-img-next"
+                      src=""
+                      alt=""
+                      width="820"
+                      height="1024"
+                      class="product-detail__main-img product-detail__main-img--offslide"
+                      aria-hidden="true"
+                      tabindex="-1"
+                      decoding="async"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="product-detail__thumbs" role="tablist" aria-label="Галерея">
+              <button type="button" class="product-thumb is-active" role="tab" aria-selected="true" aria-label="Вид 1" data-thumb="0" data-src="">
+                <span class="product-thumb__inner">
+                  <img class="product-thumb__img" src="" alt="" width="80" height="100" loading="lazy" />
+                </span>
+              </button>
+              <button type="button" class="product-thumb" role="tab" aria-selected="false" aria-label="Вид 2" data-thumb="1" data-src="">
+                <span class="product-thumb__inner">
+                  <img class="product-thumb__img" src="" alt="" width="80" height="100" loading="lazy" />
+                </span>
+              </button>
+              <button type="button" class="product-thumb" role="tab" aria-selected="false" aria-label="Вид 3" data-thumb="2" data-src="">
+                <span class="product-thumb__inner">
+                  <img class="product-thumb__img" src="" alt="" width="80" height="100" loading="lazy" />
+                </span>
+              </button>
+              <button type="button" class="product-thumb" role="tab" aria-selected="false" aria-label="Вид 4" data-thumb="3" data-src="">
+                <span class="product-thumb__inner">
+                  <img class="product-thumb__img" src="" alt="" width="80" height="100" loading="lazy" />
+                </span>
+              </button>
+              <button type="button" class="product-thumb" role="tab" aria-selected="false" aria-label="Вид 5" data-thumb="4" data-src="">
+                <span class="product-thumb__inner">
+                  <img class="product-thumb__img" src="" alt="" width="80" height="100" loading="lazy" />
+                </span>
+              </button>
+              <button type="button" class="product-thumb product-thumb--size-chart" role="tab" aria-selected="false" aria-label="Размерная сетка" data-thumb="5" data-src="">
+                <span class="product-thumb__inner">
+                  <img class="product-thumb__img" src="" alt="Размерная сетка" width="80" height="100" loading="lazy" />
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Запасной контент до product.js; при ?id= блок скрыт скриптом в head до подстановки данных. -->
+          <div class="product-detail__info">
+            <p class="product-detail__category">Футболки</p>
+            <h1 class="product-detail__title">Футболка California Boxing Club</h1>
+            <p class="product-detail__price">8 000 ₽</p>
+            <p class="product-detail__lead">
+              Футболка от C.B.C - <span class="text-caps-track">THIS IS BOXING AWESOME!</span> ®️
+            </p>
+
+            <fieldset class="product-detail__field">
+              <legend class="product-detail__label">Размер</legend>
+              <div class="product-sizes">
+                <label class="size-option">
+                  <input type="radio" name="size" value="s" />
+                  <span>S</span>
+                </label>
+                <label class="size-option">
+                  <input type="radio" name="size" value="m" checked />
+                  <span>M</span>
+                </label>
+                <label class="size-option">
+                  <input type="radio" name="size" value="l" />
+                  <span>L</span>
+                </label>
+                <label class="size-option">
+                  <input type="radio" name="size" value="xl" />
+                  <span>XL</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="product-detail__field">
+              <span class="product-detail__label" id="qty-label">Количество</span>
+              <div class="product-qty">
+                <button type="button" class="product-qty__btn" id="qty-minus" aria-label="Уменьшить количество">−</button>
+                <input
+                  type="number"
+                  class="product-qty__input"
+                  id="qty-input"
+                  min="1"
+                  max="99"
+                  value="1"
+                  inputmode="numeric"
+                  aria-labelledby="qty-label"
+                />
+                <button type="button" class="product-qty__btn" id="qty-plus" aria-label="Увеличить количество">+</button>
+              </div>
+            </div>
+
+            <div class="product-detail__actions">
+              <button
+                type="button"
+                class="btn btn--accent"
+                id="product-add-to-cart"
+                data-label-added="Перейти к оформлению"
+              >
+                <span class="product-add-to-cart__inner">
+                  <span class="product-add-to-cart__label" id="product-add-label">В корзину</span>
+                  <span class="product-add-to-cart__count" id="product-cart-count" hidden>0</span>
+                </span>
+              </button>
+              <button type="button" class="btn btn--ghost" id="product-fav" aria-pressed="false" aria-label="В избранное">
+                <svg class="bookmark-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                </svg>
+                <span id="product-fav-label">В избранное</span>
+              </button>
+            </div>
+
+            <div class="product-detail__accordion">
+              <details class="product-accordion__item" open>
+                <summary>О товаре</summary>
+                <ul>
+                  <li id="about-model-params">параметры модели: рост 160, обхваты 84/58/92, размер на модели S.</li>
+                  <li id="about-print">нанесение: спереди вышивка фирменного логотипа.</li>
+                  <li id="about-color">цвет: White</li>
+                </ul>
+              </details>
+              <details class="product-accordion__item product-accordion__item--care">
+                <summary>Состав и уход</summary>
+                <ul>
+                  <li>материал: 100% хлопок, кулирка 300 грамм</li>
+                </ul>
+              </details>
+              <details class="product-accordion__item">
+                <summary>Доставка</summary>
+                <p>Курьер по Москве, самовывоз из клуба на м. ЦСКА. Сроки и стоимость уточняйте при оформлении.</p>
+              </details>
+            </div>
+          </div>
+        </article>
+      </div>
+    </main>
+
+    <footer class="footer" id="footer">
+      <div class="container container--wide footer__grid">
+        <div class="footer__col">
+          <p class="footer__brand">California Boxing Club</p>
+          <p class="footer__phone"><a href="tel:+79152102152">+7 (915) 210 21 52</a></p>
+          <a
+            class="footer__address"
+            href="https://yandex.ru/maps/?ll=37.531289%2C55.790231&amp;z=18&amp;pt=37.531289%2C55.790231%2Cpm2rdm"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Москва, Ходынский б-р, д.4</a>
+        </div>
+        <div class="footer__col">
+          <ul class="footer__links footer__links--plain">
+            <li><a href="index.html#catalog">Каталог</a></li>
+            <li><a href="#">Личный кабинет</a></li>
+            <li><a href="index.html#footer">Контакты</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <ul class="footer__links footer__links--plain">
+            <li><a href="#">Доставка и оплата</a></li>
+            <li><a href="#">Поддержка</a></li>
+            <li><a href="#">Клуб в Москве</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <ul class="footer__links footer__links--legal">
+            <li><a href="#">Политика конфиденциальности</a></li>
+            <li><a href="#">Договор оферты</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+
+    <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Просмотр фото">
+      <div class="lightbox__backdrop" id="lightbox-backdrop"></div>
+      <button class="lightbox__close" id="lightbox-close" aria-label="Закрыть">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+      <button class="lightbox__nav lightbox__nav--prev" id="lightbox-prev" aria-label="Предыдущее фото">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+      </button>
+      <img class="lightbox__img" id="lightbox-img" src="" alt="" />
+      <button class="lightbox__nav lightbox__nav--next" id="lightbox-next" aria-label="Следующее фото">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M9 18l6-6-6-6" />
+        </svg>
+      </button>
+    </div>
+
+    <script src="js/favorites.js" defer></script>
+    <script src="js/main.js" defer></script>
+    <script src="js/products-data.js" defer></script>
+    <script src="js/product.js" defer></script>
+  </body>
+</html>
