@@ -196,7 +196,7 @@ button {
 .hero {
   position: relative;
   min-height: min(100vh, 900px);
-  min-height: min(100dvh, 900px);
+  min-height: min(100svh, 900px);
   display: flex;
   flex-direction: column;
 }
@@ -232,9 +232,10 @@ button {
   align-items: end;
   width: min(var(--max-w), 100%);
   margin-inline: auto;
+  /* svh убирает лишнюю полосу снизу на мобильных (динамическая высота dvh) */
   min-height: min(100vh, 900px);
-  min-height: min(100dvh, 900px);
-  padding: calc(var(--top-bar-h) + 0.5rem) var(--pad-x) clamp(2rem, 5vw, 3.5rem);
+  min-height: min(100svh, 900px);
+  padding: calc(var(--top-bar-h) + 0.5rem) var(--pad-x) clamp(1.5rem, 4vw, 2.75rem);
   box-sizing: border-box;
 }
 
@@ -292,6 +293,42 @@ button {
   background: rgba(255, 229, 0, 0.13);
   border-radius: 6px;
   backdrop-filter: blur(2.5px);
+}
+
+/* Текст без JS — из data-tagline */
+.hero__tagline[data-tagline]:not(.hero__tagline--typewriter)::before {
+  content: attr(data-tagline);
+  white-space: pre-wrap;
+}
+
+.hero__tagline.hero__tagline--typewriter::before {
+  content: none;
+}
+
+.hero__tagline__caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  background: currentColor;
+  animation: hero-tagline-caret 0.9s steps(2, jump-none) infinite;
+}
+
+.hero__tagline:not(.hero__tagline--typewriter-active) .hero__tagline__caret {
+  opacity: 0;
+  animation: none;
+}
+
+@keyframes hero-tagline-caret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .hero__cta {

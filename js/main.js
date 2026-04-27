@@ -134,4 +134,69 @@
     });
   }
 
+  var heroTagline = document.querySelector(".hero__tagline[data-tagline]");
+  var heroTaglineInner = heroTagline && heroTagline.querySelector(".hero__tagline__inner");
+  if (heroTagline && heroTaglineInner) {
+    var fullText = heroTagline.getAttribute("data-tagline") || "";
+    if (
+      fullText.length &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      heroTagline.classList.add("hero__tagline--typewriter");
+      heroTaglineInner.setAttribute("aria-hidden", "true");
+
+      var typeMs = 42;
+      var eraseMs = 26;
+      var pauseEndMs = 2600;
+      var pauseEmptyMs = 520;
+      var timer = null;
+
+      function setActiveCaret(active) {
+        heroTagline.classList.toggle("hero__tagline--typewriter-active", active);
+      }
+
+      function typeLoop() {
+        var i = 0;
+        setActiveCaret(true);
+
+        function tickType() {
+          if (i <= fullText.length) {
+            heroTaglineInner.textContent = fullText.slice(0, i);
+            i += 1;
+            timer = window.setTimeout(tickType, typeMs);
+            return;
+          }
+          setActiveCaret(false);
+          timer = window.setTimeout(function () {
+            eraseLoop();
+          }, pauseEndMs);
+        }
+
+        tickType();
+      }
+
+      function eraseLoop() {
+        var j = fullText.length;
+        setActiveCaret(true);
+
+        function tickErase() {
+          if (j >= 0) {
+            heroTaglineInner.textContent = fullText.slice(0, j);
+            j -= 1;
+            timer = window.setTimeout(tickErase, eraseMs);
+            return;
+          }
+          setActiveCaret(false);
+          timer = window.setTimeout(function () {
+            typeLoop();
+          }, pauseEmptyMs);
+        }
+
+        tickErase();
+      }
+
+      typeLoop();
+    }
+  }
+
 })();
