@@ -8,14 +8,13 @@ window.CBC_PRODUCTS = {
     modelParams: 'параметры модели: рост 160, обхваты 84/58/92, размер на модели S.',
     print:       'нанесение: спереди вышивка фирменного логотипа.',
     color:       'цвет: White',
-    care: 'Материал: 100% хлопок, кулирка 300 грамм',
+    care: 'Материал: 100% хлопок, кулирка 230 грамм',
     images: [
       'images/california7934.jpg',
       'images/california7935.jpg',
       'images/california7936.jpg',
       'images/california7937.jpg',
       'images/california7938.jpg',
-      'images/size-chart-tee.jpg',
     ],
   },
   'tee-2': {
@@ -27,14 +26,13 @@ window.CBC_PRODUCTS = {
     modelParams: 'параметры модели: рост 180см, обхваты 107/85/100, размер на модели XL.',
     print:       'нанесение: спереди вышивка фирменного логотипа.',
     color:       'цвет: Black',
-    care: 'материал: 100% хлопок, кулирка 300 грамм',
+    care: 'материал: 100% хлопок, кулирка 230 грамм',
     images: [
       'images/california8007.jpg',
       'images/california8010.jpg',
       'images/california8011.jpg',
       'images/california8012.jpg',
       'images/california8013.jpg',
-      'images/size-chart-tee.jpg',
     ],
   },
   'tee-3': {
@@ -53,7 +51,6 @@ window.CBC_PRODUCTS = {
       'images/california7893.jpg',
       'images/california7896.jpg',
       'images/california7898.jpg',
-      'images/size-chart-tee.jpg',
     ],
   },
   'tee-4': {
@@ -72,7 +69,6 @@ window.CBC_PRODUCTS = {
       'images/california8055.jpg',
       'images/california8057.jpg',
       'images/california8060.jpg',
-      'images/size-chart-tee.jpg',
     ],
   },
   'tee-5': {
@@ -91,7 +87,6 @@ window.CBC_PRODUCTS = {
       'images/california7947.jpg',
       'images/california7948.jpg',
       'images/california7949.jpg',
-      'images/size-chart-tee.jpg',
     ],
   },
   'tee-6': {
@@ -110,7 +105,6 @@ window.CBC_PRODUCTS = {
       'images/california8032.jpg',
       'images/california8034.jpg',
       'images/california8035.jpg',
-      'images/size-chart-tee.jpg',
     ],
   },
 };
