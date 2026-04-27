@@ -15,6 +15,7 @@ window.CBC_PRODUCTS = {
       'images/california7936.jpg',
       'images/california7937.jpg',
       'images/california7938.jpg',
+      'images/size-chart-tee.png',
     ],
   },
   'tee-2': {
@@ -33,6 +34,7 @@ window.CBC_PRODUCTS = {
       'images/california8011.jpg',
       'images/california8012.jpg',
       'images/california8013.jpg',
+      'images/size-chart-tee.png',
     ],
   },
   'tee-3': {
@@ -51,6 +53,7 @@ window.CBC_PRODUCTS = {
       'images/california7893.jpg',
       'images/california7896.jpg',
       'images/california7898.jpg',
+      'images/size-chart-tee.png',
     ],
   },
   'tee-4': {
@@ -69,6 +72,7 @@ window.CBC_PRODUCTS = {
       'images/california8055.jpg',
       'images/california8057.jpg',
       'images/california8060.jpg',
+      'images/size-chart-tee.png',
     ],
   },
   'tee-5': {
@@ -87,6 +91,7 @@ window.CBC_PRODUCTS = {
       'images/california7947.jpg',
       'images/california7948.jpg',
       'images/california7949.jpg',
+      'images/size-chart-tee.png',
     ],
   },
   'tee-6': {
@@ -105,6 +110,7 @@ window.CBC_PRODUCTS = {
       'images/california8032.jpg',
       'images/california8034.jpg',
       'images/california8035.jpg',
+      'images/size-chart-tee.png',
     ],
   },
 };
