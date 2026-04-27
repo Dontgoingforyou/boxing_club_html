@@ -290,9 +290,8 @@ button {
   line-height: 1.35;
   letter-spacing: -0.22px;
   color: #fff;
-  background: rgba(255, 229, 0, 0.13);
+  background: var(--accent);
   border-radius: 6px;
-  backdrop-filter: blur(2.5px);
 }
 
 /* Текст без JS — из data-tagline */
