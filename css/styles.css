@@ -265,9 +265,10 @@ button {
   color: var(--text);
 }
 
-/* Две строки: CALIFORNIA / BOXING WEAR (node 253:249) */
+/* Три строки: CALIFORNIA / BOXING (G отдельно) / WEAR */
 .hero__title__line1,
-.hero__title__line2 {
+.hero__title__line2,
+.hero__title__line3 {
   display: block;
 }
 
@@ -281,15 +282,16 @@ button {
 .hero__tagline {
   margin: 0;
   max-width: 42rem;
-  padding: 6px;
+  padding: 6px 10px;
   font-family: var(--font-body);
   font-size: clamp(1rem, 2.2vw, 1.375rem);
   font-weight: 400;
   line-height: 1.4;
   letter-spacing: -0.01em;
-  text-transform: none;
+  text-transform: lowercase;
   color: #f9f9f9;
-  background: rgba(255, 229, 0, 0.13);
+  /* полупрозрачный оливково-серый, ближе к макету, чем чисто жёлтый */
+  background: rgba(120, 115, 88, 0.4);
   border-radius: var(--radius-card);
   backdrop-filter: blur(2.5px);
 }
