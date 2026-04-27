@@ -148,11 +148,6 @@
                   <img class="product-thumb__img" src="" alt="" width="80" height="100" loading="lazy" />
                 </span>
               </button>
-              <button type="button" class="product-thumb product-thumb--size-chart" role="tab" aria-selected="false" aria-label="Размерная сетка" data-thumb="5" data-src="">
-                <span class="product-thumb__inner">
-                  <img class="product-thumb__img" src="" alt="Размерная сетка" width="80" height="100" loading="lazy" />
-                </span>
-              </button>
             </div>
           </div>
 
@@ -183,6 +178,10 @@
                 <label class="size-option">
                   <input type="radio" name="size" value="xl" />
                   <span>XL</span>
+                </label>
+                <label class="size-option">
+                  <input type="radio" name="size" value="2xl" />
+                  <span>2XL</span>
                 </label>
               </div>
             </fieldset>
@@ -237,8 +236,52 @@
               <details class="product-accordion__item product-accordion__item--care">
                 <summary>Состав и уход</summary>
                 <ul>
-                  <li>материал: 100% хлопок, кулирка 300 грамм</li>
+                  <li>материал: 100% хлопок, кулирка 230 грамм</li>
                 </ul>
+              </details>
+              <details class="product-accordion__item product-accordion__item--sizes">
+                <summary>Размерная сетка</summary>
+                <!-- Заменить числа в таблице на фактические от заказчика -->
+                <div class="product-size-table-wrap">
+                  <table class="product-size-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Размер</th>
+                        <th scope="col">S</th>
+                        <th scope="col">M</th>
+                        <th scope="col">L</th>
+                        <th scope="col">XL</th>
+                        <th scope="col">2XL</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">Обхват груди, см</th>
+                        <td>100</td>
+                        <td>104</td>
+                        <td>108</td>
+                        <td>112</td>
+                        <td>118</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Длина по спине, см</th>
+                        <td>69</td>
+                        <td>71</td>
+                        <td>73</td>
+                        <td>75</td>
+                        <td>77</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Ширина плеч, см</th>
+                        <td>46</td>
+                        <td>47</td>
+                        <td>48</td>
+                        <td>49</td>
+                        <td>51</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </details>
               <details class="product-accordion__item">
                 <summary>Доставка</summary>
