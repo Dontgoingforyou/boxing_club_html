@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Вход — California Boxing Wear</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;1,400&family=Jost:wght@700&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body class="page-login">
+    <header class="top-bar" id="site-header">
+      <div class="top-bar__inner">
+        <button
+          type="button"
+          class="icon-btn top-bar__menu"
+          aria-expanded="false"
+          aria-controls="drawer"
+          aria-label="Меню"
+        >
+          <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3.75 5h16.5M3.75 12h16.5M3.75 19h16.5" />
+          </svg>
+        </button>
+        <div class="top-bar__actions">
+          <button type="button" class="icon-btn" id="nav-search" aria-label="Поиск" aria-expanded="false" aria-haspopup="dialog">
+            <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+          </button>
+          <a href="favorites.html" class="icon-btn icon-btn--badged" id="nav-favorites" aria-label="Избранное">
+            <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+            </svg>
+            <span class="icon-btn__badge" id="nav-favorites-badge" hidden aria-hidden="true">0</span>
+          </a>
+          <a href="cart.html" class="icon-btn icon-btn--badged" id="nav-cart" aria-label="Корзина">
+            <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974a1.125 1.125 0 0 1 1.119 1.007Z" />
+            </svg>
+            <span class="icon-btn__badge" id="nav-cart-badge" hidden aria-hidden="true">0</span>
+          </a>
+          <a href="login.html" class="icon-btn" id="nav-account" aria-label="Личный кабинет">
+            <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="drawer" id="drawer" hidden>
+      <div class="drawer__backdrop" data-close-drawer tabindex="-1" aria-hidden="true"></div>
+      <nav class="drawer__panel" aria-label="Меню">
+        <a href="index.html">Главная</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="index.html#about">О клубе</a>
+        <a href="index.html#footer">Контакты</a>
+      </nav>
+    </div>
+
+    <main class="page page--auth">
+      <div class="container container--wide auth-layout">
+        <nav class="breadcrumbs auth-card--bare" aria-label="Хлебные крошки">
+          <a href="index.html">Главная</a>
+          <span class="breadcrumbs__sep" aria-hidden="true">/</span>
+          <span class="breadcrumbs__current">Вход</span>
+        </nav>
+
+        <div class="auth-card">
+          <h1 class="auth-card__title">Вход</h1>
+          <form id="login-form" class="auth-form" novalidate>
+            <div class="auth-field">
+              <label class="checkout-label" for="login-email">Email</label>
+              <input type="email" id="login-email" name="email" class="checkout-input" autocomplete="email" required />
+              <p class="form-error" id="err-login-email" hidden></p>
+            </div>
+            <div class="auth-field">
+              <label class="checkout-label" for="login-password">Пароль</label>
+              <input type="password" id="login-password" name="password" class="checkout-input" autocomplete="current-password" required />
+              <p class="form-error" id="err-login-password" hidden></p>
+            </div>
+            <div class="auth-actions">
+              <button type="submit" class="btn btn--accent">Войти</button>
+            </div>
+          </form>
+          <div class="auth-links">
+            <div class="auth-links__row">
+              <a href="password-reset.html">Забыли пароль?</a>
+            </div>
+            <div class="auth-links__row">
+              <span>Нет аккаунта?</span>
+              <a href="register.html">Регистрация</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer" id="footer">
+      <div class="container container--wide footer__grid">
+        <div class="footer__col">
+          <p class="footer__brand">California Boxing Club</p>
+          <p class="footer__phone"><a href="tel:+79152102152">+7 (915) 210 21 52</a></p>
+          <a
+            class="footer__address"
+            href="https://yandex.ru/maps/?ll=37.531289%2C55.790231&amp;z=18&amp;pt=37.531289%2C55.790231%2Cpm2rdm"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Москва, Ходынский б-р, д.4</a>
+        </div>
+        <div class="footer__col">
+          <ul class="footer__links footer__links--plain">
+            <li><a href="catalog.html">Каталог</a></li>
+            <li><a href="login.html" id="footer-account-link">Личный кабинет</a></li>
+            <li><a href="index.html#footer">Контакты</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <ul class="footer__links footer__links--plain">
+            <li><a href="#">Доставка и оплата</a></li>
+            <li><a href="#">Поддержка</a></li>
+            <li><a href="#">Клуб в Москве</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <ul class="footer__links footer__links--legal">
+            <li><a href="#">Политика конфиденциальности</a></li>
+            <li><a href="#">Договор оферты</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/products-data.js" defer></script>
+    <script src="js/search.js" defer></script>
+    <script src="js/favorites.js" defer></script>
+    <script src="js/cart.js" defer></script>
+    <script src="js/main.js" defer></script>
+    <script src="js/auth.js" defer></script>
+    <script src="js/shell-ready.js" defer></script>
+  </body>
+</html>

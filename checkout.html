@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Оформление заказа — California Boxing Club</title>
+    <title>Оформление заказа — California Boxing Wear</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
-    <header class="top-bar">
+    <header class="top-bar" id="site-header">
       <div class="top-bar__inner">
         <button
           type="button"
@@ -27,22 +27,24 @@
           </svg>
         </button>
         <div class="top-bar__actions">
-          <button type="button" class="icon-btn" aria-label="Поиск">
+          <button type="button" class="icon-btn" id="nav-search" aria-label="Поиск" aria-expanded="false" aria-haspopup="dialog">
             <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
             </svg>
           </button>
-          <a href="#" class="icon-btn" id="nav-favorites" aria-label="Избранное">
+          <a href="favorites.html" class="icon-btn icon-btn--badged" id="nav-favorites" aria-label="Избранное">
             <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
             </svg>
+            <span class="icon-btn__badge" id="nav-favorites-badge" hidden aria-hidden="true">0</span>
           </a>
-          <a href="#" class="icon-btn" aria-label="Корзина">
+          <a href="cart.html" class="icon-btn icon-btn--badged" id="nav-cart" aria-label="Корзина">
             <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974a1.125 1.125 0 0 1 1.119 1.007Z" />
             </svg>
+            <span class="icon-btn__badge" id="nav-cart-badge" hidden aria-hidden="true">0</span>
           </a>
-          <a href="#" class="icon-btn" aria-label="Личный кабинет">
+          <a href="login.html" class="icon-btn" id="nav-account" aria-label="Личный кабинет">
             <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
             </svg>
@@ -55,25 +57,213 @@
       <div class="drawer__backdrop" data-close-drawer tabindex="-1" aria-hidden="true"></div>
       <nav class="drawer__panel" aria-label="Меню">
         <a href="index.html">Главная</a>
-        <a href="index.html#catalog">Каталог</a>
+        <a href="catalog.html">Каталог</a>
         <a href="index.html#about">О клубе</a>
         <a href="index.html#footer">Контакты</a>
       </nav>
     </div>
 
-    <main class="page page--product">
-      <div class="container container--wide" style="padding-top: 0">
-        <p style="margin-bottom: 1.5rem">
-          <a href="product.html" style="color: var(--text-muted); font-size: 15px">← Вернуться к товару</a>
-        </p>
-        <h1 class="product-detail__title" style="margin-bottom: 12px">Оформление заказа</h1>
-        <p style="color: rgba(249, 249, 249, 0.78); max-width: 36rem; line-height: 1.6">
-          Здесь будет корзина и оплата. Пока заглушка: цель потока — как можно меньше шагов до покупки.
-        </p>
+    <main class="page page--checkout">
+      <div class="container container--wide">
+        <nav class="breadcrumbs" aria-label="Хлебные крошки">
+          <a href="index.html">Главная</a>
+          <span class="breadcrumbs__sep" aria-hidden="true">/</span>
+          <a href="cart.html">Корзина</a>
+          <span class="breadcrumbs__sep" aria-hidden="true">/</span>
+          <span class="breadcrumbs__current">Оформление</span>
+        </nav>
+
+        <div id="checkout-empty" class="checkout-empty" hidden>
+          <p class="checkout-empty__title">Корзина пуста</p>
+          <p class="checkout-empty__text">Добавьте товары в корзину, чтобы оформить заказ.</p>
+          <div class="checkout-empty__actions">
+            <a href="catalog.html" class="btn btn--accent">В каталог</a>
+            <a href="cart.html" class="btn btn--ghost">В корзину</a>
+          </div>
+        </div>
+
+        <div id="checkout-main" class="checkout-main" hidden>
+          <p class="checkout-back-wrap">
+            <a href="cart.html" class="checkout-back">← Вернуться в корзину</a>
+          </p>
+          <h1 class="checkout-page__title">Оформление заказа</h1>
+
+          <div class="checkout-layout">
+            <form id="checkout-form" class="checkout-form" novalidate>
+              <fieldset class="checkout-fieldset">
+                <legend class="checkout-legend">Контактные данные</legend>
+                <div class="checkout-field">
+                  <label class="checkout-label" for="checkout-name">Имя</label>
+                  <input
+                    type="text"
+                    id="checkout-name"
+                    name="name"
+                    class="checkout-input"
+                    autocomplete="name"
+                    required
+                    minlength="2"
+                  />
+                  <p class="form-error" id="err-name" data-checkout-error hidden></p>
+                </div>
+                <div class="checkout-field">
+                  <label class="checkout-label" for="checkout-email">Email</label>
+                  <input
+                    type="email"
+                    id="checkout-email"
+                    name="email"
+                    class="checkout-input"
+                    autocomplete="email"
+                    required
+                  />
+                  <p class="form-error" id="err-email" data-checkout-error hidden></p>
+                </div>
+                <div class="checkout-field">
+                  <label class="checkout-label" for="checkout-phone">Телефон</label>
+                  <input
+                    type="tel"
+                    id="checkout-phone"
+                    name="phone"
+                    class="checkout-input"
+                    autocomplete="tel"
+                    required
+                    inputmode="tel"
+                    placeholder="+7 …"
+                  />
+                  <p class="form-error" id="err-phone" data-checkout-error hidden></p>
+                </div>
+              </fieldset>
+
+              <fieldset class="checkout-fieldset">
+                <legend class="checkout-legend">Доставка</legend>
+                <div class="checkout-radio-group" role="radiogroup" aria-label="Способ доставки">
+                  <label class="checkout-radio">
+                    <input type="radio" name="checkout-delivery" value="courier" checked />
+                    <span>Курьер</span>
+                  </label>
+                  <label class="checkout-radio">
+                    <input type="radio" name="checkout-delivery" value="pickup" />
+                    <span>Пункт выдачи</span>
+                  </label>
+                </div>
+
+                <div id="checkout-courier-fields" class="checkout-courier-fields">
+                  <div class="checkout-field">
+                    <label class="checkout-label" for="checkout-city">Город</label>
+                    <input type="text" id="checkout-city" name="city" class="checkout-input" autocomplete="address-level2" />
+                    <p class="form-error" id="err-city" data-checkout-error hidden></p>
+                  </div>
+                  <div class="checkout-field">
+                    <label class="checkout-label" for="checkout-street">Улица</label>
+                    <input type="text" id="checkout-street" name="street" class="checkout-input" autocomplete="street-address" />
+                    <p class="form-error" id="err-street" data-checkout-error hidden></p>
+                  </div>
+                  <div class="checkout-field-row">
+                    <div class="checkout-field checkout-field--grow">
+                      <label class="checkout-label" for="checkout-house">Дом</label>
+                      <input type="text" id="checkout-house" name="house" class="checkout-input" autocomplete="on" />
+                      <p class="form-error" id="err-house" data-checkout-error hidden></p>
+                    </div>
+                    <div class="checkout-field">
+                      <label class="checkout-label" for="checkout-apt">Кв.</label>
+                      <input type="text" id="checkout-apt" name="apt" class="checkout-input" autocomplete="on" />
+                    </div>
+                  </div>
+                  <div class="checkout-field">
+                    <label class="checkout-label" for="checkout-zip">Индекс</label>
+                    <input type="text" id="checkout-zip" name="zip" class="checkout-input" inputmode="numeric" autocomplete="postal-code" />
+                  </div>
+                </div>
+
+                <div id="checkout-pickup-wrap" class="checkout-pickup-wrap" hidden>
+                  <div class="checkout-field">
+                    <label class="checkout-label" for="checkout-pickup">Адрес пункта</label>
+                    <select id="checkout-pickup" name="pickup" class="checkout-select" disabled>
+                      <option value="">Выберите пункт</option>
+                      <option value="msk-cska">Москва, м. ЦСКА — Ходынский б-р, 4</option>
+                      <option value="msk-sokol">Москва, м. Сокол — Ленинградский проспект, 74</option>
+                      <option value="msk-dynamo">Москва, м. Динамо — Ленинградский проспект, 36</option>
+                      <option value="msk-begovaya">Москва, м. Беговая — Беговая ул., 3</option>
+                      <option value="msk-airport">Москва, м. Аэропорт — Ленинградский проспект, 62</option>
+                    </select>
+                    <p class="form-error" id="err-pickup" data-checkout-error hidden></p>
+                  </div>
+                </div>
+              </fieldset>
+
+              <fieldset class="checkout-fieldset">
+                <legend class="checkout-legend">Оплата</legend>
+                <div class="checkout-radio-group" role="radiogroup" aria-label="Способ оплаты">
+                  <label class="checkout-radio">
+                    <input type="radio" name="checkout-payment" value="card" checked />
+                    <span>Онлайн картой</span>
+                  </label>
+                  <label class="checkout-radio">
+                    <input type="radio" name="checkout-payment" value="cod" />
+                    <span>При получении</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <button type="submit" class="btn btn--accent checkout-submit">Подтвердить заказ</button>
+            </form>
+
+            <aside id="checkout-aside" class="checkout-aside" aria-label="Состав заказа" hidden>
+              <h2 class="checkout-aside__title">Ваш заказ</h2>
+              <div id="checkout-summary-lines" class="checkout-summary-lines"></div>
+              <div class="checkout-summary-footer">
+                <span class="checkout-summary-footer__label">Итого</span>
+                <span class="checkout-summary-footer__total" id="checkout-summary-total">0 ₽</span>
+              </div>
+            </aside>
+          </div>
+        </div>
       </div>
     </main>
 
+    <footer class="footer" id="footer">
+      <div class="container container--wide footer__grid">
+        <div class="footer__col">
+          <p class="footer__brand">California Boxing Club</p>
+          <p class="footer__phone"><a href="tel:+79152102152">+7 (915) 210 21 52</a></p>
+          <a
+            class="footer__address"
+            href="https://yandex.ru/maps/?ll=37.531289%2C55.790231&amp;z=18&amp;pt=37.531289%2C55.790231%2Cpm2rdm"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Москва, Ходынский б-р, д.4</a>
+        </div>
+        <div class="footer__col">
+          <ul class="footer__links footer__links--plain">
+            <li><a href="catalog.html">Каталог</a></li>
+            <li><a href="login.html" id="footer-account-link">Личный кабинет</a></li>
+            <li><a href="index.html#footer">Контакты</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <ul class="footer__links footer__links--plain">
+            <li><a href="#">Доставка и оплата</a></li>
+            <li><a href="#">Поддержка</a></li>
+            <li><a href="#">Клуб в Москве</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <ul class="footer__links footer__links--legal">
+            <li><a href="#">Политика конфиденциальности</a></li>
+            <li><a href="#">Договор оферты</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/products-data.js" defer></script>
+    <script src="js/search.js" defer></script>
+    <script src="js/cart.js" defer></script>
     <script src="js/favorites.js" defer></script>
+    <script src="js/profile.js" defer></script>
+    <script src="js/orders.js" defer></script>
     <script src="js/main.js" defer></script>
+    <script src="js/checkout.js" defer></script>
+    <script src="js/auth.js" defer></script>
+    <script src="js/shell-ready.js" defer></script>
   </body>
 </html>

@@ -144,31 +144,71 @@
     });
   }
 
-  if (addToCart) {
-    var labelAdded = addToCart.getAttribute("data-label-added") || "Перейти к оформлению";
+  function getSelectedSize() {
+    var c = document.querySelector('input[name="size"]:checked');
+    return c ? c.value : "m";
+  }
+
+  function syncCartButton() {
+    if (!addToCart || !productId || !window.CBCCart) return;
+    var labelAdded = addToCart.getAttribute("data-label-added") || "Перейти в корзину";
     var addLabel = document.getElementById("product-add-label");
     var addCount = document.getElementById("product-cart-count");
-    var labelInitial = addLabel ? addLabel.textContent.trim() : "В корзину";
-    addToCart.addEventListener("click", function () {
-      if (addToCart.getAttribute("data-in-cart") === "true") {
-        window.location.href = "checkout.html";
-        return;
-      }
-      var qty = input ? clampQty(input.value) : 1;
+    var inCart = window.CBCCart.hasLine(productId, getSelectedSize());
+    if (inCart) {
       addToCart.setAttribute("data-in-cart", "true");
       addToCart.classList.add("is-in-cart");
       if (addLabel) addLabel.textContent = labelAdded;
+      var lineQty = 0;
+      window.CBCCart.getItems().forEach(function (row) {
+        if (
+          row.id === productId &&
+          String(row.size).toLowerCase() === String(getSelectedSize()).toLowerCase()
+        ) {
+          lineQty = row.qty;
+        }
+      });
       if (addCount) {
-        addCount.textContent = String(qty);
+        addCount.textContent = String(lineQty);
         addCount.hidden = false;
       }
-      addToCart.setAttribute("aria-label", labelAdded + ", количество: " + qty);
-    });
-    addToCart.setAttribute("aria-label", labelInitial);
+      addToCart.setAttribute("aria-label", labelAdded + ", количество: " + lineQty);
+    } else {
+      addToCart.setAttribute("data-in-cart", "false");
+      addToCart.classList.remove("is-in-cart");
+      if (addLabel) addLabel.textContent = "В корзину";
+      if (addCount) addCount.hidden = true;
+      addToCart.setAttribute("aria-label", labelInitial);
+    }
   }
+
+  document.querySelectorAll('input[name="size"]').forEach(function (radio) {
+    radio.addEventListener("change", syncCartButton);
+  });
+
+  if (addToCart) {
+    var labelInitialNav = "В корзину";
+    addToCart.addEventListener("click", function () {
+      if (!productId || !window.CBCCart) return;
+      if (addToCart.getAttribute("data-in-cart") === "true") {
+        window.location.href = "cart.html";
+        return;
+      }
+      var qty = input ? clampQty(input.value) : 1;
+      window.CBCCart.add({ id: productId, size: getSelectedSize(), qty: qty });
+      window.CBCCart.refreshNav();
+      syncCartButton();
+    });
+    addToCart.setAttribute("aria-label", labelInitialNav);
+  }
+
+  syncCartButton();
 
   if (window.CBCFavorites) {
     window.CBCFavorites.refreshNav();
+  }
+  if (window.CBCCart) {
+    window.CBCCart.refreshNav();
   }
 
   var mainImg = document.getElementById("product-main-img");

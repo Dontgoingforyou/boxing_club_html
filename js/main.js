@@ -1,50 +1,74 @@
 (function () {
-  var siteHeader = document.getElementById("site-header");
-  if (siteHeader && document.body.classList.contains("header-scroll-reveal")) {
-    function syncHeaderScroll() {
-      siteHeader.classList.toggle("is-scrolled", window.scrollY > 12);
+  function initShellAfterPartials() {
+    var siteHeader = document.getElementById("site-header");
+    if (siteHeader && document.body.classList.contains("header-scroll-reveal")) {
+      function syncHeaderScroll() {
+        siteHeader.classList.toggle("is-scrolled", window.scrollY > 12);
+      }
+      syncHeaderScroll();
+      window.addEventListener("scroll", syncHeaderScroll, { passive: true });
     }
-    syncHeaderScroll();
-    window.addEventListener("scroll", syncHeaderScroll, { passive: true });
-  }
 
-  var menuBtn = document.querySelector(".top-bar__menu");
-  var drawer = document.getElementById("drawer");
-  var backdrop = drawer && drawer.querySelector("[data-close-drawer]");
+    var menuBtn = document.querySelector(".top-bar__menu");
+    var drawer = document.getElementById("drawer");
+    var backdrop = drawer && drawer.querySelector("[data-close-drawer]");
 
-  function setDrawerOpen(open) {
-    if (!drawer || !menuBtn) return;
-    drawer.hidden = !open;
-    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
-    document.body.style.overflow = open ? "hidden" : "";
-  }
+    function setDrawerOpen(open) {
+      if (!drawer || !menuBtn) return;
+      drawer.hidden = !open;
+      menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      document.body.style.overflow = open ? "hidden" : "";
+    }
 
-  if (menuBtn && drawer) {
-    menuBtn.addEventListener("click", function () {
-      var open = drawer.hidden;
-      setDrawerOpen(open);
-    });
-    if (backdrop) {
-      backdrop.addEventListener("click", function () {
-        setDrawerOpen(false);
+    if (menuBtn && drawer) {
+      menuBtn.addEventListener("click", function () {
+        var open = drawer.hidden;
+        setDrawerOpen(open);
+      });
+      if (backdrop) {
+        backdrop.addEventListener("click", function () {
+          setDrawerOpen(false);
+        });
+      }
+      drawer.querySelectorAll("a").forEach(function (a) {
+        a.addEventListener("click", function () {
+          setDrawerOpen(false);
+        });
       });
     }
-    drawer.querySelectorAll("a").forEach(function (a) {
-      a.addEventListener("click", function () {
-        setDrawerOpen(false);
-      });
-    });
+
+    if (window.CBCFavorites) {
+      window.CBCFavorites.refreshNav();
+    }
+    if (window.CBCCart) {
+      window.CBCCart.refreshNav();
+    }
+  }
+
+  document.addEventListener("cbc:partials-ready", initShellAfterPartials);
+
+  function getProductGrid() {
+    return document.getElementById("product-grid");
+  }
+
+  function getCatalogCards() {
+    var grid = getProductGrid();
+    return grid ? grid.querySelectorAll(".product-card") : document.querySelectorAll(".product-card");
   }
 
   var chips = document.querySelectorAll(".filter-chip");
-  var cards = document.querySelectorAll(".product-card");
 
   function cardHasPlaceholderMedia(card) {
     return !!card.querySelector(".product-card__media.placeholder-checker");
   }
 
+  function getActiveCatalogFilter() {
+    var active = document.querySelector(".filter-chip.is-active");
+    return active ? active.getAttribute("data-filter") || "all" : "all";
+  }
+
   function applyCatalogFilter(filter) {
-    cards.forEach(function (card) {
+    getCatalogCards().forEach(function (card) {
       var cats = (card.getAttribute("data-categories") || "").split(/\s+/);
       var inCategory = cats.indexOf(filter) !== -1;
       var show;
@@ -55,6 +79,76 @@
       }
       card.classList.toggle("is-hidden", !show);
     });
+  }
+
+  function cardPriceRub(card) {
+    var raw = card.getAttribute("data-price-rub");
+    if (raw != null && raw !== "") {
+      var n = parseInt(raw, 10);
+      return isNaN(n) ? 0 : n;
+    }
+    var t = card.querySelector(".product-card__price");
+    if (!t) return 0;
+    var digits = (t.textContent || "").replace(/\D/g, "");
+    var p = parseInt(digits, 10);
+    return isNaN(p) ? 0 : p;
+  }
+
+  function cardNameSort(card) {
+    var el = card.querySelector(".product-card__name");
+    return el ? el.textContent.trim() : "";
+  }
+
+  function cardNewOrder(card) {
+    var raw = card.getAttribute("data-new-order");
+    if (raw != null && raw !== "") {
+      var n = parseInt(raw, 10);
+      return isNaN(n) ? 0 : n;
+    }
+    return 0;
+  }
+
+  function applyCatalogSort(sortKey) {
+    var grid = getProductGrid();
+    if (!grid || !sortKey) return;
+    var items = Array.prototype.slice.call(grid.querySelectorAll(".product-card"));
+    items.sort(function (a, b) {
+      var cmp = 0;
+      switch (sortKey) {
+        case "price-asc":
+          cmp = cardPriceRub(a) - cardPriceRub(b);
+          break;
+        case "price-desc":
+          cmp = cardPriceRub(b) - cardPriceRub(a);
+          break;
+        case "name": {
+          var na = cardNameSort(a);
+          var nb = cardNameSort(b);
+          cmp = na.localeCompare(nb, "ru", { sensitivity: "base" });
+          if (cmp === 0) {
+            cmp = (a.getAttribute("data-product-id") || "").localeCompare(b.getAttribute("data-product-id") || "");
+          }
+          break;
+        }
+        case "new":
+        default:
+          cmp = cardNewOrder(a) - cardNewOrder(b);
+          break;
+      }
+      return cmp;
+    });
+    items.forEach(function (card) {
+      grid.appendChild(card);
+    });
+  }
+
+  var sortSelect = document.getElementById("catalog-sort");
+  if (sortSelect) {
+    sortSelect.addEventListener("change", function () {
+      applyCatalogSort(sortSelect.value);
+      applyCatalogFilter(getActiveCatalogFilter());
+    });
+    applyCatalogSort(sortSelect.value);
   }
 
   chips.forEach(function (chip) {
@@ -69,7 +163,8 @@
   });
 
   var activeChip = document.querySelector(".filter-chip.is-active");
-  if (activeChip && cards.length) {
+  var catalogCards = getCatalogCards();
+  if (activeChip && catalogCards.length) {
     applyCatalogFilter(activeChip.getAttribute("data-filter") || "all");
   }
 
@@ -92,10 +187,6 @@
       window.CBCFavorites.refreshNav();
     });
   });
-
-  if (window.CBCFavorites) {
-    window.CBCFavorites.refreshNav();
-  }
 
   var CATALOG_HOVER_IMAGE_INDEX = 1;
 
@@ -198,5 +289,4 @@
       typeLoop();
     }
   }
-
 })();

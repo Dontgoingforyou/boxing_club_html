@@ -1,0 +1,329 @@
+(function (w) {
+  function parsePriceRub(text) {
+    if (text == null) return 0;
+    var digits = String(text).replace(/[^\d]/g, "");
+    if (!digits) return 0;
+    return parseInt(digits, 10) || 0;
+  }
+
+  function formatRub(num) {
+    var n = Math.round(Number(num)) || 0;
+    return n.toLocaleString("ru-RU") + " ₽";
+  }
+
+  function sizeLabel(size) {
+    var k = String(size || "").toLowerCase();
+    var map = { s: "S", m: "M", l: "L", xl: "XL", "2xl": "2XL" };
+    return map[k] || String(size || "").toUpperCase();
+  }
+
+  function escapeHtml(s) {
+    if (s == null) return "";
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function getProfile() {
+    return w.CBCProfile && w.CBCProfile.get ? w.CBCProfile.get() : {};
+  }
+
+  function setProfile(data) {
+    if (w.CBCProfile && w.CBCProfile.save) w.CBCProfile.save(data || {});
+  }
+
+  function newOrderId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+  }
+
+  function showFormError(el, message) {
+    if (!el) return;
+    el.textContent = message || "";
+    el.hidden = !message;
+  }
+
+  function clearErrors(form) {
+    if (!form) return;
+    form.querySelectorAll(".form-error").forEach(function (node) {
+      node.textContent = "";
+      node.hidden = true;
+    });
+  }
+
+  function renderSummary() {
+    var listEl = document.getElementById("checkout-summary-lines");
+    var totalEl = document.getElementById("checkout-summary-total");
+    var asideEl = document.getElementById("checkout-aside");
+    if (!listEl || !totalEl) return;
+
+    var cart = w.CBCCart;
+    var products = w.CBC_PRODUCTS || {};
+    if (!cart) {
+      listEl.innerHTML = "";
+      totalEl.textContent = "—";
+      return;
+    }
+
+    var items = cart.getItems();
+    var html = "";
+    items.forEach(function (row) {
+      var p = products[row.id] || {};
+      var title = p.breadcrumb || p.name || row.id;
+      var unit = parsePriceRub(p.price);
+      var line = unit * (row.qty || 0);
+      html +=
+        '<div class="checkout-summary-line">' +
+        '<div class="checkout-summary-line__main">' +
+        '<span class="checkout-summary-line__title">' +
+        escapeHtml(title) +
+        "</span>" +
+        '<span class="checkout-summary-line__meta">' +
+        escapeHtml(sizeLabel(row.size)) +
+        " × " +
+        escapeHtml(String(row.qty)) +
+        "</span>" +
+        "</div>" +
+        '<span class="checkout-summary-line__price">' +
+        escapeHtml(formatRub(line)) +
+        "</span>" +
+        "</div>";
+    });
+    listEl.innerHTML = html;
+    totalEl.textContent = formatRub(cart.total());
+    if (asideEl) asideEl.hidden = items.length === 0;
+  }
+
+  function toggleDeliveryFields() {
+    var courier = document.querySelector('input[name="checkout-delivery"][value="courier"]');
+    var isCourier = courier && courier.checked;
+    var block = document.getElementById("checkout-courier-fields");
+    var pickup = document.getElementById("checkout-pickup-wrap");
+    if (block) {
+      block.hidden = !isCourier;
+      block.querySelectorAll("input").forEach(function (inp) {
+        inp.disabled = !isCourier;
+      });
+    }
+    if (pickup) {
+      pickup.hidden = isCourier;
+      var sel = document.getElementById("checkout-pickup");
+      if (sel) sel.disabled = isCourier;
+    }
+  }
+
+  function prefillFromProfile() {
+    var p = getProfile();
+    var map = [
+      ["checkout-name", "name"],
+      ["checkout-email", "email"],
+      ["checkout-phone", "phone"],
+      ["checkout-city", "city"],
+      ["checkout-street", "street"],
+      ["checkout-house", "house"],
+      ["checkout-apt", "apt"],
+      ["checkout-zip", "zip"],
+    ];
+    map.forEach(function (pair) {
+      var el = document.getElementById(pair[0]);
+      if (el && p[pair[1]]) el.value = String(p[pair[1]]);
+    });
+  }
+
+  function validate(form) {
+    clearErrors(form);
+    var ok = true;
+    var name = document.getElementById("checkout-name");
+    var email = document.getElementById("checkout-email");
+    var phone = document.getElementById("checkout-phone");
+
+    if (name && String(name.value).trim().length < 2) {
+      showFormError(document.getElementById("err-name"), "Укажите имя (не короче 2 символов).");
+      ok = false;
+    }
+    if (email) {
+      if (!String(email.value).trim()) {
+        showFormError(document.getElementById("err-email"), "Укажите email.");
+        ok = false;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email.value).trim())) {
+        showFormError(document.getElementById("err-email"), "Некорректный email.");
+        ok = false;
+      }
+    }
+    if (phone && String(phone.value).replace(/\D/g, "").length < 10) {
+      showFormError(document.getElementById("err-phone"), "Укажите телефон (не меньше 10 цифр).");
+      ok = false;
+    }
+
+    var courierRadio = document.querySelector('input[name="checkout-delivery"][value="courier"]');
+    if (courierRadio && courierRadio.checked) {
+      var city = document.getElementById("checkout-city");
+      var street = document.getElementById("checkout-street");
+      var house = document.getElementById("checkout-house");
+      if (!city || !String(city.value).trim()) {
+        showFormError(document.getElementById("err-city"), "Укажите город.");
+        ok = false;
+      }
+      if (!street || !String(street.value).trim()) {
+        showFormError(document.getElementById("err-street"), "Укажите улицу.");
+        ok = false;
+      }
+      if (!house || !String(house.value).trim()) {
+        showFormError(document.getElementById("err-house"), "Укажите дом.");
+        ok = false;
+      }
+    } else {
+      var pickup = document.getElementById("checkout-pickup");
+      if (!pickup || !String(pickup.value).trim()) {
+        showFormError(document.getElementById("err-pickup"), "Выберите пункт выдачи.");
+        ok = false;
+      }
+    }
+
+    return ok;
+  }
+
+  function buildSnapshotItems() {
+    var cart = w.CBCCart;
+    var products = w.CBC_PRODUCTS || {};
+    if (!cart) return [];
+    return cart.getItems().map(function (row) {
+      var p = products[row.id] || {};
+      var unit = parsePriceRub(p.price);
+      return {
+        id: row.id,
+        size: row.size,
+        qty: row.qty,
+        name: p.breadcrumb || p.name || row.id,
+        priceText: p.price || "—",
+        unitRub: unit,
+        lineTotalRub: unit * (row.qty || 0),
+      };
+    });
+  }
+
+  function onSubmit(e) {
+    e.preventDefault();
+    var form = e.target;
+    if (!w.CBCCart || w.CBCCart.count() === 0) {
+      w.location.href = "cart.html";
+      return;
+    }
+    if (!validate(form)) return;
+
+    var courierEl = document.querySelector('input[name="checkout-delivery"][value="courier"]');
+    var deliveryCourier = courierEl && courierEl.checked;
+    var cardPayEl = document.querySelector('input[name="checkout-payment"][value="card"]');
+    var paymentCard = cardPayEl && cardPayEl.checked;
+
+    var contact = {
+      name: String(document.getElementById("checkout-name").value).trim(),
+      email: String(document.getElementById("checkout-email").value).trim(),
+      phone: String(document.getElementById("checkout-phone").value).trim(),
+    };
+
+    var address = {
+      deliveryType: deliveryCourier ? "courier" : "pickup",
+      courier: deliveryCourier
+        ? {
+            city: String(document.getElementById("checkout-city").value).trim(),
+            street: String(document.getElementById("checkout-street").value).trim(),
+            house: String(document.getElementById("checkout-house").value).trim(),
+            apt: String(document.getElementById("checkout-apt").value).trim(),
+            zip: String(document.getElementById("checkout-zip").value).trim(),
+          }
+        : null,
+      pickupId: deliveryCourier ? null : String(document.getElementById("checkout-pickup").value),
+      pickupLabel: deliveryCourier
+        ? null
+        : (function () {
+            var sel = document.getElementById("checkout-pickup");
+            if (!sel || !sel.selectedOptions[0]) return "";
+            return sel.selectedOptions[0].textContent.trim();
+          })(),
+    };
+
+    var total = w.CBCCart.total();
+    var id = newOrderId();
+    var createdAt = new Date().toISOString();
+
+    var order = {
+      id: id,
+      createdAt: createdAt,
+      items: buildSnapshotItems(),
+      contact: contact,
+      address: address,
+      payment: paymentCard ? "card" : "cod",
+      total: total,
+    };
+
+    if (w.CBCOrders && w.CBCOrders.push) w.CBCOrders.push(order);
+
+    setProfile({
+      name: contact.name,
+      email: contact.email,
+      phone: contact.phone,
+      city: address.courier ? address.courier.city : "",
+      street: address.courier ? address.courier.street : "",
+      house: address.courier ? address.courier.house : "",
+      apt: address.courier ? address.courier.apt : "",
+      zip: address.courier ? address.courier.zip : "",
+    });
+
+    w.CBCCart.clear();
+    if (w.CBCCart.refreshNav) w.CBCCart.refreshNav();
+
+    w.location.href = "order-success.html?id=" + encodeURIComponent(id);
+  }
+
+  function initCheckoutPage() {
+    var emptyEl = document.getElementById("checkout-empty");
+    var mainEl = document.getElementById("checkout-main");
+    if (!mainEl) return;
+
+    if (!w.CBCCart || w.CBCCart.count() === 0) {
+      if (emptyEl) emptyEl.hidden = false;
+      mainEl.hidden = true;
+      return;
+    }
+
+    if (emptyEl) emptyEl.hidden = true;
+    mainEl.hidden = false;
+
+    prefillFromProfile();
+    renderSummary();
+    toggleDeliveryFields();
+
+    document.querySelectorAll('input[name="checkout-delivery"]').forEach(function (r) {
+      r.addEventListener("change", toggleDeliveryFields);
+    });
+
+    var form = document.getElementById("checkout-form");
+    if (form) form.addEventListener("submit", onSubmit);
+  }
+
+  function boot() {
+    initCheckoutPage();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+
+  document.addEventListener("cbc:partials-ready", function () {
+    if (w.CBCCart && w.CBCCart.refreshNav) w.CBCCart.refreshNav();
+    renderSummary();
+    var emptyEl = document.getElementById("checkout-empty");
+    var mainEl = document.getElementById("checkout-main");
+    if (w.CBCCart && w.CBCCart.count() === 0) {
+      if (emptyEl) emptyEl.hidden = false;
+      if (mainEl) mainEl.hidden = true;
+    } else {
+      if (emptyEl) emptyEl.hidden = true;
+      if (mainEl) mainEl.hidden = false;
+    }
+  });
+})(window);
