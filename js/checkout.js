@@ -35,6 +35,11 @@
       .replace(/"/g, "&quot;");
   }
 
+  function orderSuccessUrl(id) {
+    var base = /\/account\//.test(w.location.pathname) ? "../" : "";
+    return base + "order-success.html?id=" + encodeURIComponent(id);
+  }
+
   function getProfile() {
     return w.CBCProfile && w.CBCProfile.get ? w.CBCProfile.get() : {};
   }
@@ -270,7 +275,7 @@
     e.preventDefault();
     var form = e.target;
     if (!w.CBCCart || w.CBCCart.count() === 0) {
-      w.location.href = "cart.html";
+      if (w.CBCOpenCartDrawer) w.CBCOpenCartDrawer();
       return;
     }
     if (!validate(form)) return;
@@ -337,38 +342,32 @@
     w.CBCCart.clear();
     if (w.CBCCart.refreshNav) w.CBCCart.refreshNav();
 
-    w.location.href = "order-success.html?id=" + encodeURIComponent(id);
+    w.location.href = orderSuccessUrl(id);
   }
 
-  function initCheckoutPage() {
-    var emptyEl = document.getElementById("checkout-empty");
-    var mainEl = document.getElementById("checkout-main");
-    if (!mainEl) return;
-
-    if (!w.CBCCart || w.CBCCart.count() === 0) {
-      if (emptyEl) emptyEl.hidden = false;
-      mainEl.hidden = true;
-      return;
-    }
-
-    if (emptyEl) emptyEl.hidden = true;
-    mainEl.hidden = false;
-
-    prefillFromProfile();
-    bindCheckoutPhoneMask();
-    renderSummary();
-    toggleDeliveryFields();
+  function bindCheckoutFormOnce() {
+    var form = document.getElementById("checkout-form");
+    if (!form || form._cbcCheckoutBound) return;
+    form._cbcCheckoutBound = true;
+    form.addEventListener("submit", onSubmit);
 
     document.querySelectorAll('input[name="checkout-delivery"]').forEach(function (r) {
       r.addEventListener("change", toggleDeliveryFields);
     });
-
-    var form = document.getElementById("checkout-form");
-    if (form) form.addEventListener("submit", onSubmit);
   }
 
+  w.CBCCheckoutOnDrawerStep = function () {
+    prefillFromProfile();
+    bindCheckoutPhoneMask();
+    renderSummary();
+    toggleDeliveryFields();
+    bindCheckoutFormOnce();
+  };
+
   function boot() {
-    initCheckoutPage();
+    bindCheckoutFormOnce();
+    renderSummary();
+    bindCheckoutPhoneMask();
   }
 
   if (document.readyState === "loading") {
@@ -381,14 +380,6 @@
     if (w.CBCCart && w.CBCCart.refreshNav) w.CBCCart.refreshNav();
     renderSummary();
     bindCheckoutPhoneMask();
-    var emptyEl = document.getElementById("checkout-empty");
-    var mainEl = document.getElementById("checkout-main");
-    if (w.CBCCart && w.CBCCart.count() === 0) {
-      if (emptyEl) emptyEl.hidden = false;
-      if (mainEl) mainEl.hidden = true;
-    } else {
-      if (emptyEl) emptyEl.hidden = true;
-      if (mainEl) mainEl.hidden = false;
-    }
+    bindCheckoutFormOnce();
   });
 })(window);

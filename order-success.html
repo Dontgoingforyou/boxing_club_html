@@ -38,12 +38,12 @@
             </svg>
             <span class="icon-btn__badge" id="nav-favorites-badge" hidden aria-hidden="true">0</span>
           </a>
-          <a href="cart.html" class="icon-btn icon-btn--badged" id="nav-cart" aria-label="Корзина">
+          <button type="button" class="icon-btn icon-btn--badged" id="nav-cart" aria-label="Корзина" aria-expanded="false" aria-controls="cart-drawer">
             <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974a1.125 1.125 0 0 1 1.119 1.007Z" />
             </svg>
             <span class="icon-btn__badge" id="nav-cart-badge" hidden aria-hidden="true">0</span>
-          </a>
+          </button>
           <a href="login.html" class="icon-btn" id="nav-account" aria-label="Личный кабинет">
             <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
@@ -144,6 +144,8 @@
     <script src="js/main.js" defer></script>
     <script src="js/order-success.js" defer></script>
     <script src="js/auth.js" defer></script>
-    <script src="js/shell-ready.js" defer></script>
+    <div data-include="partials/cart-drawer.html"></div>
+    <script src="js/include.js" defer></script>
+    <script src="js/checkout.js" defer></script>
   </body>
 </html>

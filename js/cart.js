@@ -8,6 +8,19 @@
 
   var pendingRemoval = null;
 
+  function pathToRoot() {
+    return /\/account\//.test(w.location.pathname) ? "../" : "";
+  }
+
+  function resolveProductAssetUrl(raw) {
+    if (!raw) return "";
+    var s = String(raw);
+    if (/^(?:https?:)?\/\//i.test(s) || s.charAt(0) === "/" || s.indexOf("data:") === 0) {
+      return s;
+    }
+    return pathToRoot() + s.replace(/^\.\//, "");
+  }
+
   function clampQty(n) {
     var v = parseInt(String(n), 10);
     if (isNaN(v) || v < 1) return 1;
@@ -148,6 +161,87 @@
     w.CBCCart.render();
   }
 
+  function idxFromLineEl(el) {
+    var row = el && el.closest ? el.closest("[data-line-index]") : null;
+    if (!row) return -1;
+    var raw = row.getAttribute("data-line-index");
+    var i = parseInt(raw, 10);
+    return isNaN(i) ? -1 : i;
+  }
+
+  function bindCartDrawerHandlersOnce() {
+    var root = document.getElementById("cart-drawer");
+    if (!root || root._cbcCartUiBound) return;
+    root._cbcCartUiBound = true;
+
+    root.addEventListener("click", function (e) {
+      var t = e.target;
+      if (!t || !t.closest) return;
+      var undo = t.closest("[data-undo-remove]");
+      if (undo) {
+        e.preventDefault();
+        cancelPendingRemoval();
+        w.CBCCart.render();
+        return;
+      }
+      var rm = t.closest("[data-remove-line]");
+      if (rm) {
+        e.preventDefault();
+        var ix = idxFromLineEl(rm);
+        if (ix < 0) return;
+        var itemsNow = w.CBCCart.getItems();
+        if (!itemsNow[ix]) return;
+        var clickedSnap = {
+          id: itemsNow[ix].id,
+          size: itemsNow[ix].size,
+          qty: itemsNow[ix].qty,
+        };
+        if (pendingRemoval && lineEqual(pendingRemoval.snapshot, clickedSnap)) {
+          commitPendingRemoval();
+          w.CBCCart.refreshNav();
+          w.CBCCart.render();
+          return;
+        }
+        if (pendingRemoval) {
+          commitPendingRemoval();
+          w.CBCCart.refreshNav();
+          w.CBCCart.render();
+        }
+        var ix2 = findLineIndex(clickedSnap);
+        if (ix2 >= 0) {
+          startPendingRemoval(ix2);
+        }
+        return;
+      }
+      var deltaBtn = t.closest("[data-qty-delta]");
+      if (deltaBtn) {
+        e.preventDefault();
+        if (deltaBtn.closest("[data-qty-blocked]")) return;
+        if (pendingRemoval) commitPendingRemoval();
+        var ix = idxFromLineEl(deltaBtn);
+        if (ix < 0) return;
+        var delta = parseInt(deltaBtn.getAttribute("data-qty-delta"), 10);
+        var row = w.CBCCart.getItems()[ix];
+        if (!row) return;
+        w.CBCCart.update(ix, row.qty + (delta || 0));
+        w.CBCCart.refreshNav();
+        w.CBCCart.render();
+      }
+    });
+
+    root.addEventListener("change", function (e) {
+      var inp = e.target;
+      if (!inp || inp.getAttribute("data-qty-input") == null) return;
+      if (inp.closest("[data-qty-blocked]")) return;
+      if (pendingRemoval) commitPendingRemoval();
+      var ix = idxFromLineEl(inp);
+      if (ix < 0) return;
+      w.CBCCart.update(ix, inp.value);
+      w.CBCCart.refreshNav();
+      w.CBCCart.render();
+    });
+  }
+
   w.CBCCart = {
     getItems: function () {
       return getItems().slice();
@@ -248,40 +342,42 @@
     },
 
     render: function () {
-      var tbody = document.getElementById("cart-table-body");
-      var emptyEl = document.getElementById("cart-empty");
-      var contentEl = document.getElementById("cart-content");
-      var totalEl = document.getElementById("cart-summary-total");
-      var checkoutBtn = document.getElementById("cart-checkout-btn");
+      var linesEl = document.getElementById("cart-drawer-lines");
+      var emptyEl = document.getElementById("cart-drawer-empty");
+      var cartBlock = document.getElementById("cart-drawer-cart");
+      var totalEl = document.getElementById("cart-drawer-total");
 
-      if (!tbody) return;
+      bindCartDrawerHandlersOnce();
+
+      if (!linesEl) return;
 
       var items = getItems();
       var products = w.CBC_PRODUCTS || {};
+      var base = pathToRoot();
       var html = "";
 
       items.forEach(function (row, idx) {
         var p = products[row.id];
         var title = (p && (p.breadcrumb || p.name)) || row.id;
         var priceText = (p && p.price) || "—";
-        var imgUrl = p && p.images && p.images.length ? p.images[0] : "";
+        var imgUrl = p && p.images && p.images.length ? resolveProductAssetUrl(p.images[0]) : "";
         var unitRub = lineUnitRub(row);
         var lineSum = unitRub * (row.qty || 0);
         var isPending = pendingRemoval && lineEqual(pendingRemoval.snapshot, row);
-        var removeCell = "";
+        var removeBlock = "";
         if (isPending) {
           var secLeft = pendingRemoval
             ? Math.max(0, Math.ceil((pendingRemoval.endsAt - Date.now()) / 1000))
             : 5;
-          removeCell =
-            '<div class="cart-pending-remove">' +
+          removeBlock =
+            '<div class="cart-pending-remove cart-drawer__line-remove">' +
             '<span class="cart-pending-remove__msg">Удалим через <strong id="cart-remove-countdown">' +
             escapeHtml(String(secLeft)) +
             '</strong> с</span>' +
             '<button type="button" class="cart-remove-undo link-more" data-undo-remove>Отменить</button>' +
             "</div>";
         } else {
-          removeCell =
+          removeBlock =
             '<button type="button" class="cart-remove-link" data-remove-line aria-label="Удалить позицию">' +
             REMOVE_ICON_SVG +
             "<span>Удалить</span>" +
@@ -292,38 +388,38 @@
         var qtyAria = isPending ? ' aria-disabled="true"' : "";
 
         html +=
-          '<tr class="cart-row' +
+          '<article class="cart-drawer__line cart-row' +
           (isPending ? " cart-row--pending-remove" : "") +
           '" data-line-index="' +
           idx +
           '">' +
-          '<td class="cart-cell cart-cell--media">' +
+          '<div class="cart-drawer__line-media">' +
           (imgUrl
-            ? '<a href="product.html?id=' +
+            ? '<a href="' +
+              base +
+              "product.html?id=" +
               encodeURIComponent(row.id) +
-              '" class="cart-thumb-wrap">' +
+              '" class="cart-drawer__line-thumb-wrap">' +
               '<img src="' +
               escapeHtml(imgUrl) +
-              '" alt="" class="cart-thumb" width="96" height="150" loading="lazy" />' +
+              '" alt="" width="72" height="112" loading="lazy" />' +
               "</a>"
             : '<span class="cart-thumb cart-thumb--placeholder" aria-hidden="true"></span>') +
-          "</td>" +
-          '<td class="cart-cell cart-cell--info">' +
-          '<a href="product.html?id=' +
+          "</div>" +
+          '<div class="cart-drawer__line-main">' +
+          '<a href="' +
+          base +
+          "product.html?id=" +
           encodeURIComponent(row.id) +
-          '" class="cart-title-link">' +
+          '" class="cart-drawer__line-title">' +
           escapeHtml(title) +
           "</a>" +
-          '<p class="cart-meta">Размер: <span class="cart-size">' +
+          '<p class="cart-drawer__line-meta">Размер: <span class="cart-size">' +
           escapeHtml(sizeLabel(row.size)) +
-          "</span></p>" +
-          "</td>" +
-          '<td class="cart-cell cart-cell--price">' +
-          '<span class="cart-price-unit">' +
+          "</span> · " +
           escapeHtml(priceText) +
-          "</span>" +
-          "</td>" +
-          '<td class="cart-cell cart-cell--qty">' +
+          "</p>" +
+          '<div class="cart-drawer__line-row">' +
           '<div class="product-qty product-qty--sm"' +
           (isPending ? " data-qty-blocked" : "") +
           ' data-line-qty' +
@@ -341,112 +437,30 @@
           qtyDisabled +
           ">+</button>" +
           "</div>" +
-          "</td>" +
-          '<td class="cart-cell cart-cell--sum">' +
-          '<span class="cart-line-sum">' +
+          '<span class="cart-drawer__line-price">' +
           formatRubHtml(lineSum) +
           "</span>" +
-          "</td>" +
-          '<td class="cart-cell cart-cell--remove">' +
-          removeCell +
-          "</td>" +
-          "</tr>";
+          "</div>" +
+          '<div class="cart-drawer__line-remove">' +
+          removeBlock +
+          "</div>" +
+          "</div>" +
+          "</article>";
       });
 
-      tbody.innerHTML = html;
+      linesEl.innerHTML = html;
 
       var isEmpty = items.length === 0;
       if (emptyEl) emptyEl.hidden = !isEmpty;
-      if (contentEl) contentEl.hidden = isEmpty;
+      if (cartBlock) cartBlock.hidden = isEmpty;
 
       var total = this.total();
       if (totalEl) totalEl.textContent = formatRub(total);
-      if (checkoutBtn) checkoutBtn.hidden = isEmpty;
 
-      bindCartPageHandlersOnce();
+      var toCheckout = document.getElementById("cart-drawer-to-checkout");
+      if (toCheckout) toCheckout.hidden = isEmpty;
     },
   };
-
-  function bindCartPageHandlersOnce() {
-    var root = document.getElementById("cart-content");
-    if (!root || root._cbcCartUiBound) return;
-    root._cbcCartUiBound = true;
-
-    function idxFromRow(el) {
-      var tr = el && el.closest ? el.closest("tr.cart-row") : null;
-      if (!tr) return -1;
-      var raw = tr.getAttribute("data-line-index");
-      var i = parseInt(raw, 10);
-      return isNaN(i) ? -1 : i;
-    }
-
-    root.addEventListener("click", function (e) {
-      var t = e.target;
-      if (!t || !t.closest) return;
-      var undo = t.closest("[data-undo-remove]");
-      if (undo) {
-        e.preventDefault();
-        cancelPendingRemoval();
-        w.CBCCart.render();
-        return;
-      }
-      var rm = t.closest("[data-remove-line]");
-      if (rm) {
-        e.preventDefault();
-        var ix = idxFromRow(rm);
-        if (ix < 0) return;
-        var itemsNow = w.CBCCart.getItems();
-        if (!itemsNow[ix]) return;
-        var clickedSnap = {
-          id: itemsNow[ix].id,
-          size: itemsNow[ix].size,
-          qty: itemsNow[ix].qty,
-        };
-        if (pendingRemoval && lineEqual(pendingRemoval.snapshot, clickedSnap)) {
-          commitPendingRemoval();
-          w.CBCCart.refreshNav();
-          w.CBCCart.render();
-          return;
-        }
-        if (pendingRemoval) {
-          commitPendingRemoval();
-          w.CBCCart.refreshNav();
-          w.CBCCart.render();
-        }
-        var ix2 = findLineIndex(clickedSnap);
-        if (ix2 >= 0) {
-          startPendingRemoval(ix2);
-        }
-        return;
-      }
-      var deltaBtn = t.closest("[data-qty-delta]");
-      if (deltaBtn) {
-        e.preventDefault();
-        if (deltaBtn.closest("[data-qty-blocked]")) return;
-        if (pendingRemoval) commitPendingRemoval();
-        var ix = idxFromRow(deltaBtn);
-        if (ix < 0) return;
-        var delta = parseInt(deltaBtn.getAttribute("data-qty-delta"), 10);
-        var row = w.CBCCart.getItems()[ix];
-        if (!row) return;
-        w.CBCCart.update(ix, row.qty + (delta || 0));
-        w.CBCCart.refreshNav();
-        w.CBCCart.render();
-      }
-    });
-
-    root.addEventListener("change", function (e) {
-      var inp = e.target;
-      if (!inp || inp.getAttribute("data-qty-input") == null) return;
-      if (inp.closest("[data-qty-blocked]")) return;
-      if (pendingRemoval) commitPendingRemoval();
-      var ix = idxFromRow(inp);
-      if (ix < 0) return;
-      w.CBCCart.update(ix, inp.value);
-      w.CBCCart.refreshNav();
-      w.CBCCart.render();
-    });
-  }
 
   document.addEventListener("cbc:partials-ready", function () {
     if (w.CBCCart) {

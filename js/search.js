@@ -1,4 +1,19 @@
 (function (w, doc) {
+  var CBC_SEARCH = {
+    HISTORY_KEY: "cbc_search_history",
+    HISTORY_MAX: 10,
+    SUGGESTION_TAGS: ["футболка", "худи", "белый", "перчатки", "шорты", "костюмы"],
+    TRENDING: ["футболка", "худи", "перчатки", "костюмы"],
+    POPULAR_IDS: ["tee-1", "tee-2", "tee-3", "tee-4"],
+    STORE_BRAND: "California Boxing Club",
+    PRICE_BUCKETS: [
+      { label: "До 5 000 ₽", min: 0, max: 5000 },
+      { label: "5 000 – 10 000 ₽", min: 5000, max: 10000 },
+      { label: "10 000 – 15 000 ₽", min: 10000, max: 15000 },
+      { label: "От 15 000 ₽", min: 15000, max: null },
+    ],
+  };
+
   function pathPrefix() {
     return /\/account(\/|$)/.test(w.location.pathname || "") ? "../" : "";
   }
@@ -42,8 +57,16 @@
     );
   }
 
+  function parsePriceRubFromProduct(p) {
+    if (!p || p.price == null) return null;
+    var digits = String(p.price).replace(/\D/g, "");
+    if (!digits) return null;
+    var n = parseInt(digits, 10);
+    return isNaN(n) ? null : n;
+  }
+
   /**
-   * Возвращает совпадения по каталогу: каждое слово запроса должно встречаться в объединённом тексте полей.
+   * Совпадения по каталогу: каждое слово запроса должно встречаться в объединённом тексте полей.
    */
   function searchProducts(query) {
     var products = w.CBC_PRODUCTS || {};
@@ -74,8 +97,87 @@
     return pathPrefix() + "product.html?id=" + encodeURIComponent(id);
   }
 
+  function buildSearchPageUrl(state) {
+    var o = state || {};
+    var params = new URLSearchParams();
+    if (o.q) params.set("q", o.q);
+    if (o.cat) params.set("cat", o.cat);
+    if (o.min != null && o.min !== "") params.set("min", String(o.min));
+    if (o.max != null && o.max !== "") params.set("max", String(o.max));
+    if (o.sort && o.sort !== "new") params.set("sort", o.sort);
+    var qs = params.toString();
+    return pathPrefix() + "search.html" + (qs ? "?" + qs : "");
+  }
+
   function searchPageHref(query) {
-    return pathPrefix() + "search.html" + (query ? "?q=" + encodeURIComponent(query) : "");
+    if (typeof query === "string") {
+      return buildSearchPageUrl({ q: query });
+    }
+    return buildSearchPageUrl(query);
+  }
+
+  function parseSearchPageState() {
+    var params = new URLSearchParams(w.location.search || "");
+    return {
+      q: (params.get("q") || "").trim(),
+      cat: (params.get("cat") || "").trim(),
+      min: params.get("min"),
+      max: params.get("max"),
+      sort: params.get("sort") || "new",
+    };
+  }
+
+  function readHistory() {
+    try {
+      var raw = w.localStorage.getItem(CBC_SEARCH.HISTORY_KEY);
+      if (!raw) return [];
+      var arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr.map(String) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function writeHistory(arr) {
+    try {
+      w.localStorage.setItem(CBC_SEARCH.HISTORY_KEY, JSON.stringify(arr.slice(0, CBC_SEARCH.HISTORY_MAX)));
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  function pushHistory(q) {
+    var nq = normalizeText(q);
+    if (!nq) return;
+    var arr = readHistory().filter(function (x) {
+      return normalizeText(x) !== nq;
+    });
+    arr.unshift(q.trim());
+    writeHistory(arr);
+  }
+
+  function clearHistory() {
+    try {
+      w.localStorage.removeItem(CBC_SEARCH.HISTORY_KEY);
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  function uniqueCategoriesFromProducts() {
+    var products = w.CBC_PRODUCTS || {};
+    var set = {};
+    Object.keys(products).forEach(function (id) {
+      var c = products[id] && products[id].category;
+      if (c) set[c] = true;
+    });
+    return Object.keys(set).sort(function (a, b) {
+      return a.localeCompare(b, "ru");
+    });
+  }
+
+  function categoryTagsFromData() {
+    return uniqueCategoriesFromProducts().slice(0, 6);
   }
 
   function renderResultsHtml(items) {
@@ -111,7 +213,6 @@
   }
 
   function renderProductCardsForPage(items) {
-    var pref = pathPrefix();
     if (!items.length) return "";
     var html = "";
     items.forEach(function (item) {
@@ -153,6 +254,111 @@
     return html;
   }
 
+  function renderOverlayHistoryList() {
+    var items = readHistory();
+    if (!items.length) {
+      return '<p class="search-overlay__empty" style="margin:0;font-size:14px">Пока пусто</p>';
+    }
+    var html = '<ul class="search-overlay__mini-list" role="list">';
+    items.forEach(function (q) {
+      html +=
+        '<li class="search-overlay__mini-item">' +
+        '<button type="button" class="search-overlay__mini-btn" data-search-history="' +
+        escapeHtml(q) +
+        '">' +
+        '<span class="search-overlay__mini-icon" aria-hidden="true">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg>' +
+        "</span>" +
+        "<span>" +
+        escapeHtml(q) +
+        "</span>" +
+        "</button></li>";
+    });
+    html += "</ul>";
+    return html;
+  }
+
+  function renderOverlayPopularHtml() {
+    var products = w.CBC_PRODUCTS || {};
+    var html = "";
+    CBC_SEARCH.POPULAR_IDS.forEach(function (id) {
+      var p = products[id];
+      if (!p) return;
+      var img = p.images && p.images.length ? p.images[0] : "";
+      var title = p.breadcrumb || p.name || id;
+      var href = productHref(id);
+      html +=
+        '<a class="search-overlay__pop-card" href="' +
+        href +
+        '">' +
+        '<div class="search-overlay__pop-img-wrap">' +
+        (img
+          ? '<img class="search-overlay__pop-img" src="' +
+            escapeHtml(img) +
+            '" alt="" width="200" height="312" loading="lazy" />'
+          : "") +
+        "</div>" +
+        '<div class="search-overlay__pop-meta">' +
+        '<span class="search-overlay__pop-brand">' +
+        escapeHtml(CBC_SEARCH.STORE_BRAND) +
+        "</span>" +
+        '<span class="search-overlay__pop-name">' +
+        escapeHtml(title) +
+        "</span>" +
+        '<p class="search-overlay__pop-price">' +
+        escapeHtml(p.price || "—") +
+        "</p>" +
+        "</div></a>";
+    });
+    return html;
+  }
+
+  function renderOverlaySuggestionTags() {
+    var merged = [];
+    var seen = {};
+    CBC_SEARCH.SUGGESTION_TAGS.forEach(function (t) {
+      if (!seen[t]) {
+        seen[t] = true;
+        merged.push(t);
+      }
+    });
+    categoryTagsFromData().forEach(function (t) {
+      if (!seen[t]) {
+        seen[t] = true;
+        merged.push(t);
+      }
+    });
+    return merged
+      .slice(0, 12)
+      .map(function (t) {
+        return (
+          '<button type="button" class="search-overlay__tag" data-search-tag="' +
+          escapeHtml(t) +
+          '">' +
+          escapeHtml(t) +
+          "</button>"
+        );
+      })
+      .join("");
+  }
+
+  function refreshOverlayExplore() {
+    var hist = doc.getElementById("cbc-search-history-list");
+    if (hist) hist.innerHTML = renderOverlayHistoryList();
+    var pop = doc.getElementById("cbc-search-popular-row");
+    if (pop) pop.innerHTML = renderOverlayPopularHtml();
+    var tags = doc.getElementById("cbc-search-tags");
+    if (tags) tags.innerHTML = renderOverlaySuggestionTags();
+  }
+
+  function overlayLupeSvg() {
+    return (
+      '<svg class="search-overlay__lupe" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">' +
+      '<path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />' +
+      "</svg>"
+    );
+  }
+
   var overlayBound = false;
   var debounceTimer;
 
@@ -177,64 +383,73 @@
       '<svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 18L18 6M6 6l12 12" /></svg>' +
       "</button>" +
       "</div>" +
-      '<label class="search-overlay__label" for="cbc-search-input">Запрос</label>' +
-      '<input type="search" id="cbc-search-input" class="search-overlay__input checkout-input" autocomplete="off" placeholder="Название, категория, цвет…" />' +
-      '<div id="cbc-search-results" class="search-overlay__results" role="region" aria-live="polite"></div>' +
-      '<p class="search-overlay__hint"><a class="search-overlay__more" id="cbc-search-open-page" href="' +
+      '<form id="cbc-search-overlay-form" class="search-overlay__search-row" role="search" action="' +
       searchPageHref("") +
-      '">Все результаты на странице поиска</a></p>' +
+      '" method="get">' +
+      '<label class="search-overlay__label" for="cbc-search-input">Запрос</label>' +
+      '<div class="search-overlay__input-wrap">' +
+      overlayLupeSvg() +
+      '<input type="search" id="cbc-search-input" name="q" class="search-overlay__input-inner" autocomplete="off" placeholder="Название, категория, цвет…" />' +
+      "</div>" +
+      '<button type="submit" class="btn btn--accent search-overlay__submit" id="cbc-search-submit">Найти</button>' +
+      "</form>" +
+      '<div id="cbc-search-tags" class="search-overlay__tags" aria-label="Быстрые подсказки"></div>' +
+      '<div class="search-overlay__results-wrap">' +
+      '<div id="cbc-search-explore" class="search-overlay__explore">' +
+      '<div class="search-overlay__explore-inner">' +
+      '<div class="search-overlay__explore-sidebar">' +
+      '<div class="search-overlay__sidebar-block">' +
+      '<div class="search-overlay__col-head">' +
+      '<p class="search-overlay__col-title">История</p>' +
+      '<button type="button" class="search-overlay__clear-history" id="cbc-search-clear-history">Очистить</button>' +
+      "</div>" +
+      '<div id="cbc-search-history-list"></div>' +
+      "</div>" +
+      '<div class="search-overlay__sidebar-block">' +
+      '<p class="search-overlay__col-title">Часто ищут</p>' +
+      '<ul class="search-overlay__mini-list" role="list">' +
+      CBC_SEARCH.TRENDING.map(function (t) {
+        return (
+          '<li class="search-overlay__mini-item">' +
+          '<button type="button" class="search-overlay__mini-btn" data-search-trend="' +
+          escapeHtml(t) +
+          '">' +
+          '<span class="search-overlay__mini-icon" aria-hidden="true">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>' +
+          "</span><span>" +
+          escapeHtml(t) +
+          "</span></button></li>"
+        );
+      }).join("") +
+      "</ul>" +
+      "</div>" +
+      "</div>" +
+      '<div class="search-overlay__explore-products">' +
+      '<p class="search-overlay__popular-title">Популярные товары</p>' +
+      '<div id="cbc-search-popular-row" class="search-overlay__popular-row"></div>' +
+      "</div>" +
+      "</div></div>" +
+      '<div id="cbc-search-live" class="search-overlay__results" role="region" aria-live="polite" hidden></div>' +
+      "</div>" +
       "</div>";
 
     doc.body.appendChild(wrap);
+    refreshOverlayExplore();
     return wrap;
-  }
-
-  function widestContentContainer() {
-    var nodes = doc.querySelectorAll("main .container--wide, main .container, .container--wide, .container");
-    var best = null;
-    var bestW = 0;
-    for (var i = 0; i < nodes.length; i++) {
-      var w = nodes[i].getBoundingClientRect().width;
-      if (w > bestW) {
-        bestW = w;
-        best = nodes[i];
-      }
-    }
-    return best;
-  }
-
-  function contentRightInsetPx(vw) {
-    var container = widestContentContainer();
-    if (container) {
-      var cr = container.getBoundingClientRect();
-      return Math.max(12, Math.round(vw - cr.right));
-    }
-    return Math.min(64, Math.max(12, Math.round(vw * 0.05)));
   }
 
   function positionSearchDropdown() {
     var btn = doc.getElementById("nav-search");
     var panel = doc.querySelector("#cbc-search-overlay .search-overlay__panel");
     if (!btn || !panel) return;
-    var vw = doc.documentElement.clientWidth || w.innerWidth || 0;
-    var r = btn.getBoundingClientRect();
     var gap = 8;
-    if (vw < 520) {
-      panel.style.top = r.bottom + gap + "px";
-      panel.style.right = "12px";
-      panel.style.left = "12px";
-      panel.style.width = "auto";
-      panel.style.maxWidth = "";
-    } else {
-      var inset = contentRightInsetPx(vw);
-      var leftMin = 12;
-      var maxFit = Math.max(0, vw - inset - leftMin);
-      panel.style.top = r.bottom + gap + "px";
-      panel.style.right = inset + "px";
-      panel.style.left = "auto";
-      panel.style.width = "540px";
-      panel.style.maxWidth = maxFit + "px";
-    }
+    var r = btn.getBoundingClientRect();
+    var pad = 12;
+    panel.style.top = r.bottom + gap + "px";
+    panel.style.left = pad + "px";
+    panel.style.right = pad + "px";
+    panel.style.width = "auto";
+    panel.style.maxWidth = "none";
   }
 
   function setOpen(open) {
@@ -243,6 +458,7 @@
     if (!overlay) return;
     overlay.hidden = !open;
     overlay.classList.toggle("search-overlay--open", open);
+    doc.documentElement.classList.toggle("search-overlay-active", open);
     if (btn) {
       btn.setAttribute("aria-expanded", open ? "true" : "false");
       btn.setAttribute("aria-controls", "cbc-search-overlay");
@@ -252,6 +468,7 @@
       w.requestAnimationFrame(function () {
         positionSearchDropdown();
       });
+      refreshOverlayExplore();
       var inp = doc.getElementById("cbc-search-input");
       if (inp) {
         window.setTimeout(function () {
@@ -259,23 +476,32 @@
           inp.select();
         }, 10);
       }
+      updateOverlayResults(inp && inp.value ? inp.value : "");
     }
   }
 
   function updateOverlayResults(query) {
-    var box = doc.getElementById("cbc-search-results");
-    var link = doc.getElementById("cbc-search-open-page");
-    if (!box) return;
+    var live = doc.getElementById("cbc-search-live");
+    var explore = doc.getElementById("cbc-search-explore");
+    if (!live || !explore) return;
     var q = String(query || "").trim();
     if (!q) {
-      box.innerHTML = "";
-    } else {
-      var items = searchProducts(query);
-      box.innerHTML = renderResultsHtml(items);
+      explore.hidden = false;
+      live.hidden = true;
+      live.innerHTML = "";
+      return;
     }
-    if (link) {
-      link.setAttribute("href", searchPageHref(q));
-    }
+    explore.hidden = true;
+    live.hidden = false;
+    var items = searchProducts(query);
+    live.innerHTML = renderResultsHtml(items);
+  }
+
+  function goSearchPageFromOverlay() {
+    var inp = doc.getElementById("cbc-search-input");
+    var q = inp ? String(inp.value || "").trim() : "";
+    if (q) pushHistory(q);
+    w.location.href = buildSearchPageUrl({ q: q });
   }
 
   function bindOverlayOnce() {
@@ -295,7 +521,53 @@
       if (t && t.closest && t.closest("[data-search-close]")) {
         e.preventDefault();
         setOpen(false);
+        return;
       }
+      var tagBtn = t && t.closest && t.closest("[data-search-tag]");
+      if (tagBtn) {
+        e.preventDefault();
+        ensureOverlay();
+        var tag = tagBtn.getAttribute("data-search-tag");
+        var inp2 = doc.getElementById("cbc-search-input");
+        if (inp2 && tag) {
+          inp2.value = tag;
+          updateOverlayResults(tag);
+        }
+        return;
+      }
+      var histBtn = t && t.closest && t.closest("[data-search-history]");
+      if (histBtn) {
+        e.preventDefault();
+        var hq = histBtn.getAttribute("data-search-history");
+        var inp3 = doc.getElementById("cbc-search-input");
+        if (inp3 && hq) {
+          inp3.value = hq;
+          updateOverlayResults(hq);
+        }
+        return;
+      }
+      var trBtn = t && t.closest && t.closest("[data-search-trend]");
+      if (trBtn) {
+        e.preventDefault();
+        var tq = trBtn.getAttribute("data-search-trend");
+        var inp4 = doc.getElementById("cbc-search-input");
+        if (inp4 && tq) {
+          inp4.value = tq;
+          updateOverlayResults(tq);
+        }
+        return;
+      }
+      if (t && t.id === "cbc-search-clear-history") {
+        e.preventDefault();
+        clearHistory();
+        refreshOverlayExplore();
+      }
+    });
+
+    doc.addEventListener("submit", function (e) {
+      if (!e.target || e.target.id !== "cbc-search-overlay-form") return;
+      e.preventDefault();
+      goSearchPageFromOverlay();
     });
 
     doc.addEventListener("keydown", function (e) {
@@ -331,6 +603,74 @@
     );
   }
 
+  function filterItemsByState(items, state) {
+    var products = w.CBC_PRODUCTS || {};
+    var cat = (state.cat || "").trim();
+    var minV = state.min != null && state.min !== "" ? parseInt(String(state.min), 10) : null;
+    var maxV = state.max != null && state.max !== "" ? parseInt(String(state.max), 10) : null;
+    if (minV != null && isNaN(minV)) minV = null;
+    if (maxV != null && isNaN(maxV)) maxV = null;
+
+    return items.filter(function (item) {
+      var p = products[item.id];
+      if (cat && (!p || (p.category || "") !== cat)) return false;
+      var rub = parsePriceRubFromProduct(p);
+      if (rub == null) return true;
+      if (minV != null && rub < minV) return false;
+      if (maxV != null && rub > maxV) return false;
+      return true;
+    });
+  }
+
+  function sortItems(items, sortKey) {
+    var products = w.CBC_PRODUCTS || {};
+    var catalogOrder = Object.keys(products);
+    var arr = items.slice();
+    arr.sort(function (a, b) {
+      var pa = products[a.id] || {};
+      var pb = products[b.id] || {};
+      var cmp = 0;
+      switch (sortKey) {
+        case "new": {
+          var ia = catalogOrder.indexOf(a.id);
+          var ib = catalogOrder.indexOf(b.id);
+          cmp = (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib);
+          break;
+        }
+        case "price-asc": {
+          var ra = parsePriceRubFromProduct(pa) || 0;
+          var rb = parsePriceRubFromProduct(pb) || 0;
+          cmp = ra - rb;
+          break;
+        }
+        case "price-desc": {
+          var ra2 = parsePriceRubFromProduct(pa) || 0;
+          var rb2 = parsePriceRubFromProduct(pb) || 0;
+          cmp = rb2 - ra2;
+          break;
+        }
+        case "name":
+          cmp = String(a.title).localeCompare(String(b.title), "ru");
+          break;
+        default:
+          cmp = 0;
+      }
+      if (cmp !== 0) return cmp;
+      return String(a.id).localeCompare(String(b.id));
+    });
+    return arr;
+  }
+
+  function categoryCountsFromItems(items) {
+    var products = w.CBC_PRODUCTS || {};
+    var map = {};
+    items.forEach(function (item) {
+      var c = (products[item.id] && products[item.id].category) || "—";
+      map[c] = (map[c] || 0) + 1;
+    });
+    return map;
+  }
+
   var searchPageDebounceTimer;
 
   function initSearchPage() {
@@ -340,43 +680,201 @@
     var empty = doc.getElementById("search-page-empty");
     if (!form || !input || !grid) return;
 
-    function syncUrlFromInput() {
-      var q = String(input.value || "").trim();
-      var url = searchPageHref(q);
+    var summaryEl = doc.getElementById("search-page-summary");
+    var summaryCats = doc.getElementById("search-page-summary-cats");
+    var refineEl = doc.getElementById("search-page-refine");
+    var aside = doc.getElementById("search-page-aside");
+    var catList = doc.getElementById("search-page-cat-list");
+    var priceMin = doc.getElementById("search-page-min");
+    var priceMax = doc.getElementById("search-page-max");
+    var priceApply = doc.getElementById("search-page-price-apply");
+    var sortSel = doc.getElementById("search-page-sort");
+    var countEl = doc.getElementById("search-page-count");
+
+    function collectState() {
+      var st = {
+        q: String(input.value || "").trim(),
+        cat: "",
+        min: priceMin && priceMin.value.trim() !== "" ? priceMin.value.trim() : "",
+        max: priceMax && priceMax.value.trim() !== "" ? priceMax.value.trim() : "",
+        sort: sortSel && sortSel.value ? sortSel.value : "new",
+      };
+      var selectedCat = doc.querySelector('input[name="search-page-cat"]:checked');
+      if (selectedCat && selectedCat.value) st.cat = selectedCat.value;
+      return st;
+    }
+
+    function setStateToUrl(state) {
+      var url = buildSearchPageUrl(state);
       if (url !== w.location.pathname + w.location.search) {
         w.history.replaceState({}, "", url);
       }
     }
 
+    function renderRefineChips(state) {
+      if (!refineEl) return;
+      var parts = [];
+      if (state.q) {
+        parts.push(
+          '<button type="button" class="search-page-refine__chip" data-refine-remove="q">Запрос: ' +
+            escapeHtml(state.q) +
+            " ×</button>"
+        );
+      }
+      if (state.cat) {
+        parts.push(
+          '<button type="button" class="search-page-refine__chip" data-refine-remove="cat">' +
+            escapeHtml(state.cat) +
+            " ×</button>"
+        );
+      }
+      if (state.min || state.max) {
+        var label = "Цена";
+        if (state.min && state.max) label += ": " + state.min + "–" + state.max + " ₽";
+        else if (state.min) label += ": от " + state.min + " ₽";
+        else label += ": до " + state.max + " ₽";
+        parts.push('<button type="button" class="search-page-refine__chip" data-refine-remove="price">' + label + " ×</button>");
+      }
+      refineEl.innerHTML =
+        parts.length > 0
+          ? '<span class="search-page-refine__label">Уточнить:</span>' + parts.join("")
+          : "";
+      refineEl.hidden = parts.length === 0;
+    }
+
+    function syncBucketRadios(st) {
+      doc.querySelectorAll('input[name="search-page-bucket"]').forEach(function (el) {
+        el.checked = false;
+      });
+      if ((st.min === "" || st.min == null) && (st.max === "" || st.max == null)) return;
+      var mn = st.min !== "" && st.min != null ? parseInt(String(st.min), 10) : null;
+      var mx = st.max !== "" && st.max != null ? parseInt(String(st.max), 10) : null;
+      if (mn != null && isNaN(mn)) return;
+      if (mx != null && isNaN(mx)) return;
+      CBC_SEARCH.PRICE_BUCKETS.forEach(function (b, idx) {
+        var matchMin = mn === b.min;
+        var matchMax =
+          b.max == null ? mx == null || String(st.max || "") === "" : mx === b.max;
+        if (matchMin && matchMax) {
+          var radio = doc.getElementById("search-page-bucket-" + idx);
+          if (radio) radio.checked = true;
+        }
+      });
+    }
+
+    function syncFormFieldsFromUrl() {
+      var st = parseSearchPageState();
+      input.value = st.q;
+      if (priceMin) priceMin.value = st.min != null && st.min !== "" ? String(st.min) : "";
+      if (priceMax) priceMax.value = st.max != null && st.max !== "" ? String(st.max) : "";
+      if (sortSel) sortSel.value = st.sort || "new";
+      syncBucketRadios(st);
+    }
+
+    function renderCategoryRadios(st) {
+      if (!catList) return;
+      var base = searchProducts(st.q);
+      var counts = categoryCountsFromItems(base);
+      var cats = Object.keys(counts).sort(function (a, b) {
+        return a.localeCompare(b, "ru");
+      });
+      var html = "";
+      html +=
+        '<li><label><input type="radio" name="search-page-cat" value=""' +
+        (!st.cat ? " checked" : "") +
+        ' /><span>Все категории</span><span class="count">' +
+        base.length +
+        "</span></label></li>";
+      cats.forEach(function (c) {
+        html +=
+          '<li><label><input type="radio" name="search-page-cat" value="' +
+          escapeHtml(c) +
+          '"' +
+          (st.cat === c ? " checked" : "") +
+          " /><span>" +
+          escapeHtml(c) +
+          '</span><span class="count">' +
+          counts[c] +
+          "</span></label></li>";
+      });
+      catList.innerHTML = html;
+    }
+
     function run() {
-      var q = String(input.value || "").trim();
-      if (!q) {
+      syncFormFieldsFromUrl();
+      var st = parseSearchPageState();
+
+      if (!st.q) {
         grid.innerHTML = "";
         grid.hidden = true;
-        if (empty) empty.hidden = true;
+        if (empty) {
+          empty.hidden = true;
+          empty.textContent = "";
+        }
+        if (summaryEl) summaryEl.hidden = true;
+        if (aside) aside.hidden = true;
+        if (refineEl) {
+          refineEl.innerHTML = "";
+          refineEl.hidden = true;
+        }
+        if (countEl) countEl.textContent = "";
+        if (catList) catList.innerHTML = "";
         return;
       }
-      var items = searchProducts(q);
-      grid.innerHTML = renderProductCardsForPage(items);
-      if (empty) {
-        empty.hidden = items.length > 0;
-        empty.textContent = "По запросу ничего не найдено.";
+
+      var base = searchProducts(st.q);
+      var filtered = filterItemsByState(base, st);
+      var sorted = sortItems(filtered, st.sort);
+
+      if (summaryEl) {
+        summaryEl.hidden = false;
+        var head = summaryEl.querySelector("[data-search-summary-head]");
+        if (head) head.textContent = "Найдено: " + sorted.length;
+        if (summaryCats) {
+          var cmap = categoryCountsFromItems(base);
+          var bits = Object.keys(cmap)
+            .sort(function (a, b) {
+              return a.localeCompare(b, "ru");
+            })
+            .map(function (c) {
+              return escapeHtml(c) + " — " + cmap[c];
+            });
+          summaryCats.textContent = bits.length ? bits.join(" · ") : "";
+        }
       }
-      grid.hidden = items.length === 0;
+
+      renderRefineChips(st);
+      if (aside) aside.hidden = false;
+      renderCategoryRadios(st);
+
+      grid.innerHTML = renderProductCardsForPage(sorted);
+      if (empty) {
+        empty.hidden = sorted.length > 0;
+        empty.textContent = "По запросу и фильтрам ничего не найдено.";
+      }
+      grid.hidden = sorted.length === 0;
+      if (countEl) countEl.textContent = sorted.length ? "Показано: " + sorted.length : "";
+
       if (w.CBCSetupCatalogCardHover) w.CBCSetupCatalogCardHover(grid);
     }
 
     function scheduleRun() {
       w.clearTimeout(searchPageDebounceTimer);
       searchPageDebounceTimer = w.setTimeout(function () {
-        syncUrlFromInput();
+        var st = collectState();
+        setStateToUrl(st);
         run();
       }, 200);
     }
 
-    var params = new URLSearchParams(w.location.search);
-    var initial = params.get("q");
-    if (initial) input.value = initial;
+    function applyImmediately(options) {
+      var opts = options || {};
+      w.clearTimeout(searchPageDebounceTimer);
+      var st = collectState();
+      setStateToUrl(st);
+      if (opts.recordHistory && st.q) pushHistory(st.q);
+      run();
+    }
 
     input.addEventListener("input", scheduleRun);
     input.addEventListener("paste", function () {
@@ -385,8 +883,83 @@
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      syncUrlFromInput();
-      w.clearTimeout(searchPageDebounceTimer);
+      applyImmediately({ recordHistory: true });
+    });
+
+    if (sortSel) {
+      sortSel.addEventListener("change", function () {
+        applyImmediately();
+      });
+    }
+
+    if (priceMin) {
+      priceMin.addEventListener("change", function () {
+        doc.querySelectorAll('input[name="search-page-bucket"]').forEach(function (el) {
+          el.checked = false;
+        });
+        applyImmediately();
+      });
+    }
+    if (priceMax) {
+      priceMax.addEventListener("change", function () {
+        doc.querySelectorAll('input[name="search-page-bucket"]').forEach(function (el) {
+          el.checked = false;
+        });
+        applyImmediately();
+      });
+    }
+
+    if (priceApply) {
+      priceApply.addEventListener("click", function () {
+        doc.querySelectorAll('input[name="search-page-bucket"]').forEach(function (el) {
+          el.checked = false;
+        });
+        applyImmediately();
+      });
+    }
+
+    doc.querySelectorAll('input[name="search-page-bucket"]').forEach(function (el) {
+      el.addEventListener("change", function () {
+        if (!el.checked) return;
+        var idx = parseInt(el.value, 10);
+        var b = CBC_SEARCH.PRICE_BUCKETS[idx];
+        if (!b) return;
+        if (priceMin) priceMin.value = b.min != null ? String(b.min) : "";
+        if (priceMax) priceMax.value = b.max != null ? String(b.max) : "";
+        applyImmediately();
+      });
+    });
+
+    if (catList) {
+      catList.addEventListener("change", function (e) {
+        if (!e.target || e.target.name !== "search-page-cat") return;
+        applyImmediately();
+      });
+    }
+
+    if (refineEl) {
+      refineEl.addEventListener("click", function (e) {
+        var btn = e.target && e.target.closest && e.target.closest("[data-refine-remove]");
+        if (!btn) return;
+        var key = btn.getAttribute("data-refine-remove");
+        if (key === "q") input.value = "";
+        if (key === "cat") {
+          var all = doc.querySelector('input[name="search-page-cat"][value=""]');
+          if (all) all.checked = true;
+        }
+        if (key === "price") {
+          if (priceMin) priceMin.value = "";
+          if (priceMax) priceMax.value = "";
+          doc.querySelectorAll('input[name="search-page-bucket"]').forEach(function (el) {
+            el.checked = false;
+          });
+        }
+        applyImmediately();
+      });
+    }
+
+    w.addEventListener("popstate", function () {
+      syncFormFieldsFromUrl();
       run();
     });
 
@@ -402,6 +975,8 @@
     search: searchProducts,
     productHref: productHref,
     searchPageHref: searchPageHref,
+    buildSearchPageUrl: buildSearchPageUrl,
+    parseSearchPageState: parseSearchPageState,
   };
 
   if (doc.readyState === "loading") {

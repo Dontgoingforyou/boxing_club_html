@@ -191,7 +191,7 @@
     addToCart.addEventListener("click", function () {
       if (!productId || !window.CBCCart) return;
       if (addToCart.getAttribute("data-in-cart") === "true") {
-        window.location.href = "cart.html";
+        if (window.CBCOpenCartDrawer) window.CBCOpenCartDrawer();
         return;
       }
       var qty = input ? clampQty(input.value) : 1;
@@ -624,14 +624,16 @@
     lbPrev.disabled = lbIndex === 0;
     lbNext.disabled = lbIndex === lbSrcs.length - 1;
     lightbox.hidden = false;
-    document.body.style.overflow = "hidden";
+    if (window.CBCSyncBodyScrollLock) window.CBCSyncBodyScrollLock();
+    else document.body.style.overflow = "hidden";
     lbClose.focus();
   }
 
   function lbClose_fn() {
     if (!lightbox) return;
     lightbox.hidden = true;
-    document.body.style.overflow = "";
+    if (window.CBCSyncBodyScrollLock) window.CBCSyncBodyScrollLock();
+    else document.body.style.overflow = "";
     if (mainImg) mainImg.focus();
   }
 

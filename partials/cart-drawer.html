@@ -1,0 +1,168 @@
+<div class="cart-drawer" id="cart-drawer" hidden>
+  <div class="cart-drawer__backdrop" data-close-cart-drawer tabindex="-1" aria-hidden="true"></div>
+  <div
+    class="cart-drawer__panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cart-drawer-title"
+  >
+    <div class="cart-drawer__head">
+      <h2 class="cart-drawer__title" id="cart-drawer-title">Корзина</h2>
+      <button type="button" class="cart-drawer__close" data-close-cart-drawer aria-label="Закрыть">
+        ×
+      </button>
+    </div>
+    <div class="cart-drawer__body">
+      <div id="cart-drawer-step-cart" class="cart-drawer__step">
+        <div id="cart-drawer-empty" class="cart-drawer__empty">
+          <p class="cart-drawer__empty-text">Корзина пуста. Добавьте товары из каталога.</p>
+          <a href="catalog.html" class="btn btn--accent cart-drawer__catalog-link">В каталог</a>
+        </div>
+        <div id="cart-drawer-cart" class="cart-drawer__cart" hidden>
+          <div id="cart-drawer-lines" class="cart-drawer__lines"></div>
+          <div class="cart-drawer__footer">
+            <div class="cart-drawer__total-row">
+              <p class="cart-drawer__total-label">Итого</p>
+              <p class="cart-drawer__total-value" id="cart-drawer-total">0 ₽</p>
+            </div>
+            <button type="button" class="btn btn--accent cart-drawer__cta" id="cart-drawer-to-checkout">
+              Перейти к оформлению
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="cart-drawer-step-checkout" class="cart-drawer__step cart-drawer__checkout" hidden>
+        <div class="cart-drawer__head cart-drawer__head--sub">
+          <button type="button" class="checkout-back" id="cart-drawer-back-to-cart">← Назад к корзине</button>
+        </div>
+        <aside id="checkout-aside" class="checkout-aside" aria-label="Состав заказа" hidden>
+          <h2 class="checkout-aside__title">Ваш заказ</h2>
+          <div id="checkout-summary-lines" class="checkout-summary-lines"></div>
+          <div class="checkout-summary-footer">
+            <span class="checkout-summary-footer__label">Итого</span>
+            <span class="checkout-summary-footer__total" id="checkout-summary-total">0 ₽</span>
+          </div>
+        </aside>
+
+        <form id="checkout-form" class="checkout-form" novalidate>
+            <fieldset class="checkout-fieldset">
+              <legend class="checkout-legend">Контактные данные</legend>
+              <div class="checkout-field">
+                <label class="checkout-label" for="checkout-name">Имя</label>
+                <input
+                  type="text"
+                  id="checkout-name"
+                  name="name"
+                  class="checkout-input"
+                  autocomplete="name"
+                  required
+                  minlength="2"
+                />
+                <p class="form-error" id="err-name" data-checkout-error hidden></p>
+              </div>
+              <div class="checkout-field">
+                <label class="checkout-label" for="checkout-email">Email</label>
+                <input
+                  type="email"
+                  id="checkout-email"
+                  name="email"
+                  class="checkout-input"
+                  autocomplete="email"
+                  required
+                />
+                <p class="form-error" id="err-email" data-checkout-error hidden></p>
+              </div>
+              <div class="checkout-field">
+                <label class="checkout-label" for="checkout-phone">Телефон</label>
+                <input
+                  type="tel"
+                  id="checkout-phone"
+                  name="phone"
+                  class="checkout-input"
+                  autocomplete="tel"
+                  required
+                  inputmode="tel"
+                  placeholder="+7 …"
+                />
+                <p class="form-error" id="err-phone" data-checkout-error hidden></p>
+              </div>
+            </fieldset>
+
+            <fieldset class="checkout-fieldset">
+              <legend class="checkout-legend">Доставка</legend>
+              <div class="checkout-radio-group" role="radiogroup" aria-label="Способ доставки">
+                <label class="checkout-radio">
+                  <input type="radio" name="checkout-delivery" value="courier" checked />
+                  <span>Курьер</span>
+                </label>
+                <label class="checkout-radio">
+                  <input type="radio" name="checkout-delivery" value="pickup" />
+                  <span>Пункт выдачи</span>
+                </label>
+              </div>
+
+              <div id="checkout-courier-fields" class="checkout-courier-fields">
+                <div class="checkout-field">
+                  <label class="checkout-label" for="checkout-city">Город</label>
+                  <input type="text" id="checkout-city" name="city" class="checkout-input" autocomplete="address-level2" />
+                  <p class="form-error" id="err-city" data-checkout-error hidden></p>
+                </div>
+                <div class="checkout-field">
+                  <label class="checkout-label" for="checkout-street">Улица</label>
+                  <input type="text" id="checkout-street" name="street" class="checkout-input" autocomplete="street-address" />
+                  <p class="form-error" id="err-street" data-checkout-error hidden></p>
+                </div>
+                <div class="checkout-field-row">
+                  <div class="checkout-field checkout-field--grow">
+                    <label class="checkout-label" for="checkout-house">Дом</label>
+                    <input type="text" id="checkout-house" name="house" class="checkout-input" autocomplete="on" />
+                    <p class="form-error" id="err-house" data-checkout-error hidden></p>
+                  </div>
+                  <div class="checkout-field">
+                    <label class="checkout-label" for="checkout-apt">Кв.</label>
+                    <input type="text" id="checkout-apt" name="apt" class="checkout-input" autocomplete="on" />
+                  </div>
+                </div>
+                <div class="checkout-field">
+                  <label class="checkout-label" for="checkout-zip">Индекс</label>
+                  <input type="text" id="checkout-zip" name="zip" class="checkout-input" inputmode="numeric" autocomplete="postal-code" />
+                </div>
+              </div>
+
+              <div id="checkout-pickup-wrap" class="checkout-pickup-wrap" hidden>
+                <div class="checkout-field">
+                  <label class="checkout-label" for="checkout-pickup">Адрес пункта</label>
+                  <select id="checkout-pickup" name="pickup" class="checkout-select" disabled>
+                    <option value="">Выберите пункт</option>
+                    <option value="msk-cska">Москва, м. ЦСКА — Ходынский б-р, 4</option>
+                    <option value="msk-sokol">Москва, м. Сокол — Ленинградский проспект, 74</option>
+                    <option value="msk-dynamo">Москва, м. Динамо — Ленинградский проспект, 36</option>
+                    <option value="msk-begovaya">Москва, м. Беговая — Беговая ул., 3</option>
+                    <option value="msk-airport">Москва, м. Аэропорт — Ленинградский проспект, 62</option>
+                  </select>
+                  <p class="form-error" id="err-pickup" data-checkout-error hidden></p>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="checkout-fieldset">
+              <legend class="checkout-legend">Оплата</legend>
+              <div class="checkout-radio-group" role="radiogroup" aria-label="Способ оплаты">
+                <label class="checkout-radio">
+                  <input type="radio" name="checkout-payment" value="card" checked />
+                  <span>Онлайн картой</span>
+                </label>
+                <label class="checkout-radio">
+                  <input type="radio" name="checkout-payment" value="cod" />
+                  <span>При получении</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <button type="submit" class="btn btn--accent checkout-submit">Подтвердить заказ</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -38,12 +38,12 @@
             </svg>
             <span class="icon-btn__badge" id="nav-favorites-badge" hidden aria-hidden="true">0</span>
           </a>
-          <a href="cart.html" class="icon-btn icon-btn--badged" id="nav-cart" aria-label="Корзина">
+          <button type="button" class="icon-btn icon-btn--badged" id="nav-cart" aria-label="Корзина" aria-expanded="false" aria-controls="cart-drawer">
             <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974a1.125 1.125 0 0 1 1.119 1.007Z" />
             </svg>
             <span class="icon-btn__badge" id="nav-cart-badge" hidden aria-hidden="true">0</span>
-          </a>
+          </button>
           <a href="login.html" class="icon-btn" id="nav-account" aria-label="Личный кабинет">
             <svg class="top-bar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
@@ -73,23 +73,103 @@
 
         <h1 class="favorites-page__title">Поиск по каталогу</h1>
 
-        <form id="search-page-form" class="search-page-toolbar" role="search" action="search.html" method="get">
+        <form id="search-page-form" class="search-page-toolbar search-page-toolbar--full" role="search" action="search.html" method="get">
           <label class="checkout-label search-page-toolbar__label" for="search-page-input">Запрос</label>
-          <div class="search-page-toolbar__row">
-            <input
-              type="search"
-              id="search-page-input"
-              name="q"
-              class="checkout-input search-page-input"
-              placeholder="Например: футболка, перчатки, белый…"
-              autocomplete="off"
-            />
-            <button type="submit" class="btn btn--accent search-page-submit">Найти</button>
+          <div class="search-page-toolbar__row search-page__search-row">
+            <div class="search-page__input-wrap">
+              <svg
+                class="search-page__lupe"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                aria-hidden="true"
+              >
+                <path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+              </svg>
+              <input
+                type="search"
+                id="search-page-input"
+                name="q"
+                class="search-page-input--inner"
+                placeholder="Название, категория, цвет…"
+                autocomplete="off"
+              />
+            </div>
+            <button type="submit" class="btn btn--accent search-page-submit search-page-submit--caps">Найти</button>
+          </div>
+          <div class="search-page-toolbar-band">
+            <div class="search-page-main__toolbar">
+              <p id="search-page-count" class="search-page-main__count"></p>
+              <select id="search-page-sort" class="search-page-sort" aria-label="Сортировка товаров">
+                <option value="new">По новизне</option>
+                <option value="price-asc">По цене: сначала дешевле</option>
+                <option value="price-desc">По цене: сначала дороже</option>
+                <option value="name">По названию</option>
+              </select>
+            </div>
           </div>
         </form>
 
-        <p id="search-page-empty" class="search-page-empty" hidden>По запросу ничего не найдено.</p>
-        <div id="search-page-grid" class="product-grid search-page-grid" hidden></div>
+        <div id="search-page-summary" class="search-page-summary" hidden>
+          <span data-search-summary-head>Найдено: 0</span>
+          <p id="search-page-summary-cats" class="search-page-summary__cats"></p>
+        </div>
+
+        <div id="search-page-refine" class="search-page-refine" hidden></div>
+
+        <div class="search-page-layout">
+          <aside id="search-page-aside" class="search-page-aside" hidden>
+            <div class="search-page-filter-block">
+              <p class="search-page-filter-block__title">Категория</p>
+              <ul id="search-page-cat-list" class="search-page-filter-list"></ul>
+            </div>
+            <div class="search-page-filter-block">
+              <p class="search-page-filter-block__title">Цена, ₽</p>
+              <div class="search-page-price-row">
+                <input
+                  type="number"
+                  inputmode="numeric"
+                  id="search-page-min"
+                  class="checkout-input"
+                  placeholder="От"
+                  min="0"
+                  aria-label="Цена от"
+                />
+                <input
+                  type="number"
+                  inputmode="numeric"
+                  id="search-page-max"
+                  class="checkout-input"
+                  placeholder="До"
+                  min="0"
+                  aria-label="Цена до"
+                />
+                <button type="button" class="btn btn--ghost" id="search-page-price-apply">Применить</button>
+              </div>
+              <ul class="search-page-price-buckets">
+                <li>
+                  <label><input type="radio" name="search-page-bucket" id="search-page-bucket-0" value="0" /> До 5 000 ₽</label>
+                </li>
+                <li>
+                  <label><input type="radio" name="search-page-bucket" id="search-page-bucket-1" value="1" /> 5 000 – 10 000 ₽</label>
+                </li>
+                <li>
+                  <label><input type="radio" name="search-page-bucket" id="search-page-bucket-2" value="2" /> 10 000 – 15 000 ₽</label>
+                </li>
+                <li>
+                  <label><input type="radio" name="search-page-bucket" id="search-page-bucket-3" value="3" /> От 15 000 ₽</label>
+                </li>
+              </ul>
+            </div>
+          </aside>
+          <div class="search-page-main">
+            <p id="search-page-empty" class="search-page-empty" hidden></p>
+            <div id="search-page-grid" class="product-grid search-page-grid" hidden></div>
+          </div>
+        </div>
       </div>
     </main>
 
@@ -134,6 +214,8 @@
     <script src="js/cart.js" defer></script>
     <script src="js/main.js" defer></script>
     <script src="js/auth.js" defer></script>
-    <script src="js/shell-ready.js" defer></script>
+    <div data-include="partials/cart-drawer.html"></div>
+    <script src="js/include.js" defer></script>
+    <script src="js/checkout.js" defer></script>
   </body>
 </html>
