@@ -191,6 +191,9 @@
       }
 
       bindFavoriteCardHandlers(grid);
+      if (w.CBCSetupCatalogCardHover) {
+        w.CBCSetupCatalogCardHover(grid);
+      }
     }
   };
 

@@ -31,7 +31,16 @@
 
   function formatRub(num) {
     var n = Math.round(Number(num)) || 0;
-    return n.toLocaleString("ru-RU") + " ₽";
+    return n.toLocaleString("ru-RU") + "\u00a0₽";
+  }
+
+  function formatRubHtml(num) {
+    var n = Math.round(Number(num)) || 0;
+    return (
+      '<span class="price-rub"><span class="price-rub__amount">' +
+      esc(n.toLocaleString("ru-RU")) +
+      '</span><span class="price-rub__currency">₽</span></span>'
+    );
   }
 
   function formatDate(iso) {
@@ -113,7 +122,7 @@
         "</div>" +
         '<div class="account-order-card__footer">' +
         '<span class="account-order-card__total">' +
-        esc(formatRub(o.total)) +
+        formatRubHtml(o.total) +
         "</span>" +
         '<a class="btn btn--ghost btn--sm" href="order.html?id=' +
         encodeURIComponent(o.id) +
@@ -180,7 +189,7 @@
           "</span>" +
           "</div>" +
           '<span class="order-detail-line__price">' +
-          esc(formatRub(line.lineTotalRub != null ? line.lineTotalRub : 0)) +
+          formatRubHtml(line.lineTotalRub != null ? line.lineTotalRub : 0) +
           "</span>" +
           "</div>";
       });

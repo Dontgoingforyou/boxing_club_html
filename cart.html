@@ -93,16 +93,14 @@
         <div id="cart-content" class="cart-layout" hidden>
           <div class="cart-layout__table-wrap">
             <table class="cart-table" aria-label="Товары в корзине">
-              <thead>
-                <tr>
-                  <th class="cart-th cart-th--media" scope="col"></th>
-                  <th class="cart-th cart-th--info" scope="col">Товар</th>
-                  <th class="cart-th cart-th--price" scope="col">Цена</th>
-                  <th class="cart-th cart-th--qty" scope="col">Количество</th>
-                  <th class="cart-th cart-th--sum" scope="col">Сумма</th>
-                  <th class="cart-th cart-th--remove" scope="col"><span class="cart-th-sr">Удалить</span></th>
-                </tr>
-              </thead>
+              <colgroup>
+                <col class="cart-col--media" />
+                <col class="cart-col--info" />
+                <col class="cart-col--price" />
+                <col class="cart-col--qty" />
+                <col class="cart-col--sum" />
+                <col class="cart-col--remove" />
+              </colgroup>
               <tbody id="cart-table-body"></tbody>
             </table>
           </div>

@@ -65,12 +65,6 @@
 
     <main class="page page--auth">
       <div class="container container--wide auth-layout">
-        <nav class="breadcrumbs auth-card--bare" aria-label="Хлебные крошки">
-          <a href="index.html">Главная</a>
-          <span class="breadcrumbs__sep" aria-hidden="true">/</span>
-          <span class="breadcrumbs__current">Регистрация</span>
-        </nav>
-
         <div class="auth-card">
           <h1 class="auth-card__title">Регистрация</h1>
           <form id="register-form" class="auth-form" novalidate>
@@ -86,12 +80,79 @@
             </div>
             <div class="auth-field">
               <label class="checkout-label" for="register-password">Пароль</label>
-              <input type="password" id="register-password" name="password" class="checkout-input" autocomplete="new-password" required minlength="6" />
+              <div class="password-field">
+                <input
+                  type="password"
+                  id="register-password"
+                  name="password"
+                  class="checkout-input password-field__input"
+                  autocomplete="new-password"
+                  required
+                  minlength="6"
+                />
+                <button
+                  type="button"
+                  class="password-field__toggle"
+                  aria-label="Показать пароль"
+                  aria-pressed="false"
+                >
+                  <svg class="password-field__icon password-field__icon--show" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                    />
+                    <path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" stroke="currentColor" stroke-width="1.5" />
+                  </svg>
+                  <svg class="password-field__icon password-field__icon--hide" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.274M1.757 1.757l20.486 20.486M9.88 9.88a3 3 0 1 0 4.243 4.242"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
               <p class="form-error" id="err-register-password" hidden></p>
             </div>
             <div class="auth-field">
               <label class="checkout-label" for="register-password2">Повтор пароля</label>
-              <input type="password" id="register-password2" name="password2" class="checkout-input" autocomplete="new-password" required />
+              <div class="password-field">
+                <input
+                  type="password"
+                  id="register-password2"
+                  name="password2"
+                  class="checkout-input password-field__input"
+                  autocomplete="new-password"
+                  required
+                />
+                <button
+                  type="button"
+                  class="password-field__toggle"
+                  aria-label="Показать пароль"
+                  aria-pressed="false"
+                >
+                  <svg class="password-field__icon password-field__icon--show" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                    />
+                    <path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" stroke="currentColor" stroke-width="1.5" />
+                  </svg>
+                  <svg class="password-field__icon password-field__icon--hide" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.274M1.757 1.757l20.486 20.486M9.88 9.88a3 3 0 1 0 4.243 4.242"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
               <p class="form-error" id="err-register-password2" hidden></p>
             </div>
             <div class="auth-actions">

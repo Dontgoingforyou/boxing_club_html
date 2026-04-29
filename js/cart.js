@@ -1,6 +1,13 @@
 (function (w) {
   var KEY = "cbc-cart";
 
+  var REMOVE_ICON_SVG =
+    '<svg class="cart-remove-link__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" />' +
+    "</svg>";
+
+  var pendingRemoval = null;
+
   function clampQty(n) {
     var v = parseInt(String(n), 10);
     if (isNaN(v) || v < 1) return 1;
@@ -10,6 +17,18 @@
 
   function normalizeSize(s) {
     return String(s == null ? "" : s).toLowerCase();
+  }
+
+  function lineEqual(a, b) {
+    return !!(a && b && a.id === b.id && normalizeSize(a.size) === normalizeSize(b.size));
+  }
+
+  function findLineIndex(snapshot) {
+    var items = getItems();
+    for (var i = 0; i < items.length; i++) {
+      if (lineEqual(items[i], snapshot)) return i;
+    }
+    return -1;
   }
 
   function getItems() {
@@ -47,7 +66,16 @@
 
   function formatRub(num) {
     var n = Math.round(Number(num)) || 0;
-    return n.toLocaleString("ru-RU") + " ₽";
+    return n.toLocaleString("ru-RU") + "\u00a0₽";
+  }
+
+  function formatRubHtml(num) {
+    var n = Math.round(Number(num)) || 0;
+    return (
+      '<span class="price-rub"><span class="price-rub__amount">' +
+      escapeHtml(n.toLocaleString("ru-RU")) +
+      '</span><span class="price-rub__currency">₽</span></span>'
+    );
   }
 
   var SIZE_LABELS = {
@@ -69,14 +97,62 @@
     return p ? parsePriceRub(p.price) : 0;
   }
 
+  function cancelPendingRemoval() {
+    if (!pendingRemoval) return;
+    if (pendingRemoval.timerId) w.clearTimeout(pendingRemoval.timerId);
+    if (pendingRemoval.tickId) w.clearInterval(pendingRemoval.tickId);
+    pendingRemoval = null;
+  }
+
+  function commitPendingRemoval() {
+    if (!pendingRemoval) return;
+    var snap = pendingRemoval.snapshot;
+    cancelPendingRemoval();
+    var items = getItems();
+    for (var i = 0; i < items.length; i++) {
+      if (lineEqual(items[i], snap)) {
+        items.splice(i, 1);
+        setItems(items);
+        return;
+      }
+    }
+  }
+
+  function startPendingRemoval(idx) {
+    cancelPendingRemoval();
+    var items = getItems();
+    if (idx < 0 || idx >= items.length) return;
+    var snapshot = {
+      id: items[idx].id,
+      size: items[idx].size,
+      qty: items[idx].qty,
+    };
+    var endsAt = Date.now() + 5000;
+    pendingRemoval = {
+      snapshot: snapshot,
+      endsAt: endsAt,
+      timerId: null,
+      tickId: null,
+    };
+    pendingRemoval.timerId = w.setTimeout(function () {
+      commitPendingRemoval();
+      w.CBCCart.refreshNav();
+      w.CBCCart.render();
+    }, 5000);
+    pendingRemoval.tickId = w.setInterval(function () {
+      var el = document.getElementById("cart-remove-countdown");
+      if (!pendingRemoval || !el) return;
+      var left = Math.max(0, Math.ceil((pendingRemoval.endsAt - Date.now()) / 1000));
+      el.textContent = String(left);
+    }, 250);
+    w.CBCCart.render();
+  }
+
   w.CBCCart = {
     getItems: function () {
       return getItems().slice();
     },
 
-    /**
-     * Есть ли в корзине позиция с этим товаром и размером.
-     */
     hasLine: function (id, size) {
       var sz = normalizeSize(size);
       return getItems().some(function (row) {
@@ -84,9 +160,6 @@
       });
     },
 
-    /**
-     * Добавить позицию или увеличить количество той же вариации.
-     */
     add: function (obj) {
       if (!obj || !obj.id) return;
       var id = obj.id;
@@ -131,14 +204,12 @@
       setItems([]);
     },
 
-    /** Суммарное количество единиц товара (штук). */
     count: function () {
       return getItems().reduce(function (acc, row) {
         return acc + (row.qty || 0);
       }, 0);
     },
 
-    /** Итого в рублях (число). */
     total: function () {
       var items = getItems();
       var sum = 0;
@@ -176,9 +247,6 @@
       }
     },
 
-    /**
-     * Рендер таблицы корзины: #cart-empty / #cart-table-body / #cart-summary-total / #cart-checkout-btn.
-     */
     render: function () {
       var tbody = document.getElementById("cart-table-body");
       var emptyEl = document.getElementById("cart-empty");
@@ -199,9 +267,34 @@
         var imgUrl = p && p.images && p.images.length ? p.images[0] : "";
         var unitRub = lineUnitRub(row);
         var lineSum = unitRub * (row.qty || 0);
+        var isPending = pendingRemoval && lineEqual(pendingRemoval.snapshot, row);
+        var removeCell = "";
+        if (isPending) {
+          var secLeft = pendingRemoval
+            ? Math.max(0, Math.ceil((pendingRemoval.endsAt - Date.now()) / 1000))
+            : 5;
+          removeCell =
+            '<div class="cart-pending-remove">' +
+            '<span class="cart-pending-remove__msg">Удалим через <strong id="cart-remove-countdown">' +
+            escapeHtml(String(secLeft)) +
+            '</strong> с</span>' +
+            '<button type="button" class="cart-remove-undo link-more" data-undo-remove>Отменить</button>' +
+            "</div>";
+        } else {
+          removeCell =
+            '<button type="button" class="cart-remove-link" data-remove-line aria-label="Удалить позицию">' +
+            REMOVE_ICON_SVG +
+            "<span>Удалить</span>" +
+            "</button>";
+        }
+
+        var qtyDisabled = isPending ? " disabled" : "";
+        var qtyAria = isPending ? ' aria-disabled="true"' : "";
 
         html +=
-          '<tr class="cart-row" data-line-index="' +
+          '<tr class="cart-row' +
+          (isPending ? " cart-row--pending-remove" : "") +
+          '" data-line-index="' +
           idx +
           '">' +
           '<td class="cart-cell cart-cell--media">' +
@@ -231,23 +324,31 @@
           "</span>" +
           "</td>" +
           '<td class="cart-cell cart-cell--qty">' +
-          '<div class="product-qty product-qty--sm" data-line-qty>' +
-          '<button type="button" class="product-qty__btn" data-qty-delta="-1" aria-label="Уменьшить количество">−</button>' +
+          '<div class="product-qty product-qty--sm"' +
+          (isPending ? " data-qty-blocked" : "") +
+          ' data-line-qty' +
+          qtyAria +
+          ">" +
+          '<button type="button" class="product-qty__btn" data-qty-delta="-1" aria-label="Уменьшить количество"' +
+          qtyDisabled +
+          ">−</button>" +
           '<input type="number" class="product-qty__input" min="1" max="99" value="' +
           escapeHtml(String(row.qty)) +
-          '" inputmode="numeric" aria-label="Количество" data-qty-input />' +
-          '<button type="button" class="product-qty__btn" data-qty-delta="1" aria-label="Увеличить количество">+</button>' +
+          '" inputmode="numeric" aria-label="Количество" data-qty-input' +
+          qtyDisabled +
+          " />" +
+          '<button type="button" class="product-qty__btn" data-qty-delta="1" aria-label="Увеличить количество"' +
+          qtyDisabled +
+          ">+</button>" +
           "</div>" +
           "</td>" +
           '<td class="cart-cell cart-cell--sum">' +
           '<span class="cart-line-sum">' +
-          escapeHtml(formatRub(lineSum)) +
+          formatRubHtml(lineSum) +
           "</span>" +
           "</td>" +
           '<td class="cart-cell cart-cell--remove">' +
-          '<button type="button" class="cart-remove btn btn--ghost" data-remove-line aria-label="Удалить позицию">' +
-          "Удалить" +
-          "</button>" +
+          removeCell +
           "</td>" +
           "</tr>";
       });
@@ -282,20 +383,47 @@
     root.addEventListener("click", function (e) {
       var t = e.target;
       if (!t || !t.closest) return;
+      var undo = t.closest("[data-undo-remove]");
+      if (undo) {
+        e.preventDefault();
+        cancelPendingRemoval();
+        w.CBCCart.render();
+        return;
+      }
       var rm = t.closest("[data-remove-line]");
       if (rm) {
         e.preventDefault();
         var ix = idxFromRow(rm);
-        if (ix >= 0) {
-          w.CBCCart.remove(ix);
+        if (ix < 0) return;
+        var itemsNow = w.CBCCart.getItems();
+        if (!itemsNow[ix]) return;
+        var clickedSnap = {
+          id: itemsNow[ix].id,
+          size: itemsNow[ix].size,
+          qty: itemsNow[ix].qty,
+        };
+        if (pendingRemoval && lineEqual(pendingRemoval.snapshot, clickedSnap)) {
+          commitPendingRemoval();
           w.CBCCart.refreshNav();
           w.CBCCart.render();
+          return;
+        }
+        if (pendingRemoval) {
+          commitPendingRemoval();
+          w.CBCCart.refreshNav();
+          w.CBCCart.render();
+        }
+        var ix2 = findLineIndex(clickedSnap);
+        if (ix2 >= 0) {
+          startPendingRemoval(ix2);
         }
         return;
       }
       var deltaBtn = t.closest("[data-qty-delta]");
       if (deltaBtn) {
         e.preventDefault();
+        if (deltaBtn.closest("[data-qty-blocked]")) return;
+        if (pendingRemoval) commitPendingRemoval();
         var ix = idxFromRow(deltaBtn);
         if (ix < 0) return;
         var delta = parseInt(deltaBtn.getAttribute("data-qty-delta"), 10);
@@ -310,6 +438,8 @@
     root.addEventListener("change", function (e) {
       var inp = e.target;
       if (!inp || inp.getAttribute("data-qty-input") == null) return;
+      if (inp.closest("[data-qty-blocked]")) return;
+      if (pendingRemoval) commitPendingRemoval();
       var ix = idxFromRow(inp);
       if (ix < 0) return;
       w.CBCCart.update(ix, inp.value);

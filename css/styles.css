@@ -109,22 +109,25 @@
 }
 
 .checkout-form {
-  max-width: 640px;
+  max-width: min(1280px, 100%);
 }
 
 .checkout-fieldset {
-  margin: 0 0 28px;
+  margin: 0;
   padding: 0;
   border: none;
+}
+
+.checkout-fieldset + .checkout-fieldset {
+  margin-top: 36px;
 }
 
 .checkout-legend {
   padding: 0;
   margin: 0 0 16px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   color: var(--text-muted);
 }
 
@@ -220,8 +223,9 @@
 
 .checkout-submit {
   width: 100%;
-  max-width: 320px;
+  max-width: 100%;
   margin-top: 8px;
+  box-sizing: border-box;
 }
 
 .form-error {
@@ -259,7 +263,7 @@ body.page-login .page--auth {
 
 .auth-layout {
   width: 100%;
-  max-width: 440px;
+  max-width: min(880px, 100%);
   margin-left: auto;
   margin-right: auto;
 }
@@ -310,11 +314,77 @@ body.page-login .page--auth {
 }
 
 .auth-actions {
-  margin-top: 24px;
+  margin-top: 16px;
+}
+
+.password-field {
+  position: relative;
+  display: block;
+}
+
+.password-field .checkout-input,
+.password-field .password-field__input {
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 52px;
+}
+
+.password-field__toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 52px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0 12px 12px 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.password-field__toggle:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.password-field__toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.password-field__toggle .password-field__icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  fill: none;
+  pointer-events: none;
+}
+
+.password-field__toggle .password-field__icon--hide {
+  display: none;
+}
+
+.password-field__toggle[aria-pressed="true"] .password-field__icon--show {
+  display: none;
+}
+
+.password-field__toggle[aria-pressed="true"] .password-field__icon--hide {
+  display: block;
 }
 
 .auth-actions .btn {
   width: 100%;
+  max-width: none;
   box-sizing: border-box;
 }
 
@@ -385,7 +455,7 @@ body.page-login .page--auth {
 
 .search-page-input {
   flex: 1;
-  min-width: min(100%, 240px);
+  min-width: min(100%, 320px);
 }
 
 .search-page-submit {
@@ -641,7 +711,7 @@ body.page-login .page--auth {
 }
 
 .account-shell__main--wide {
-  max-width: 720px;
+  max-width: min(1440px, 100%);
 }
 
 .account-nav {
@@ -676,6 +746,9 @@ body.page-login .page--auth {
 }
 
 .account-nav__logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   margin-top: 12px;
   padding: 12px 14px;
   border: none;
@@ -690,13 +763,33 @@ body.page-login .page--auth {
   transition: color 0.15s ease, background 0.15s ease;
 }
 
+.account-nav__logout svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  fill: none;
+}
+
 .account-nav__logout:hover {
   color: #ff6b8a;
   background: rgba(255, 107, 138, 0.08);
 }
 
 .profile-view__edit {
-  margin-top: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.profile-view__edit svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  fill: none;
 }
 
 .profile-dl {
@@ -725,10 +818,9 @@ body.page-login .page--auth {
 
 .profile-dl dt {
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   color: var(--text-muted);
 }
 
@@ -753,9 +845,16 @@ body.page-login .page--auth {
 
 .profile-form__actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  flex-wrap: nowrap;
   gap: 12px;
-  margin-top: 28px;
+  margin-top: 18px;
+}
+
+.profile-form__actions .btn {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
 }
 
 .account-orders-empty {
@@ -839,6 +938,10 @@ body.page-login .page--auth {
   font-size: 18px;
 }
 
+.account-order-card__total .price-rub {
+  font-weight: inherit;
+}
+
 .btn--sm {
   padding: 10px 18px;
   font-size: 14px;
@@ -866,8 +969,7 @@ body.page-login .page--auth {
   margin: 0 0 14px;
   font-size: 14px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   color: var(--text-muted);
 }
 
@@ -921,6 +1023,22 @@ body.page-login .page--auth {
   white-space: nowrap;
 }
 
+.price-rub {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.2em;
+  white-space: nowrap;
+}
+
+.price-rub__amount {
+  font-variant-numeric: tabular-nums;
+}
+
+.price-rub__currency {
+  font-size: 1em;
+  line-height: 1;
+}
+
 .order-detail-dl {
   margin: 0;
   padding: 16px;
@@ -939,6 +1057,10 @@ body.page-login .page--auth {
 }
 
 .order-detail-dl__row:last-child {
+  border-bottom: none;
+}
+
+.order-detail-dl__row:has(+ .order-detail-dl__row--total) {
   border-bottom: none;
 }
 
@@ -1036,6 +1158,10 @@ body.page-login .page--auth {
 .checkout-summary-line__price {
   font-weight: 600;
   white-space: nowrap;
+}
+
+.checkout-summary-line__price .price-rub {
+  font-weight: inherit;
 }
 
 .checkout-summary-footer {
@@ -1145,7 +1271,7 @@ body.page-login .page--auth {
   align-items: stretch;
   gap: 12px;
   width: 100%;
-  max-width: min(100%, 320px);
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -1727,9 +1853,34 @@ button {
 
 .cart-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 15px;
   color: var(--text);
+}
+
+.cart-col--media {
+  width: 112px;
+}
+
+.cart-col--info {
+  width: auto;
+}
+
+.cart-col--price {
+  width: 12%;
+}
+
+.cart-col--qty {
+  width: 148px;
+}
+
+.cart-col--sum {
+  width: 13%;
+}
+
+.cart-col--remove {
+  width: 168px;
 }
 
 .cart-th {
@@ -1783,6 +1934,74 @@ button {
   white-space: nowrap;
 }
 
+.cart-line-sum {
+  font-variant-numeric: tabular-nums;
+  display: inline-block;
+  min-width: 6.5ch;
+  text-align: right;
+}
+
+.cart-remove-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 0 6px;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--text);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.cart-remove-link:hover {
+  color: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.cart-remove-link__icon {
+  flex-shrink: 0;
+}
+
+.cart-pending-remove {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.cart-pending-remove__msg {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.cart-pending-remove__msg strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.cart-remove-undo {
+  font-size: 17px;
+}
+
+.cart-row--pending-remove .cart-cell:not(.cart-cell--remove) {
+  opacity: 0.72;
+}
+
+.product-qty[data-qty-blocked] .product-qty__btn,
+.product-qty[data-qty-blocked] .product-qty__input {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .cart-thumb-wrap {
   display: block;
   border-radius: 8px;
@@ -1820,6 +2039,7 @@ button {
 }
 
 .cart-price-unit {
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
@@ -1865,9 +2085,12 @@ button {
 }
 
 .product-qty--sm .product-qty__input {
-  width: 44px;
+  width: 48px;
+  min-width: 48px;
   height: 36px;
   font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
 }
 
 .page--catalog {
@@ -1941,7 +2164,7 @@ button {
   margin-top: 32px;
 }
 
-.catalog__cta-all {
+.catalog__cta-link {
   text-decoration: none;
 }
 
@@ -2251,6 +2474,12 @@ button {
   background: var(--accent-hover);
 }
 
+.checkout-submit.btn--accent {
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* Footer */
 .footer {
   padding: 0 0 48px;
@@ -2370,6 +2599,7 @@ button {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+  margin-top: 10px;
   margin-bottom: 32px;
   font-size: 15px;
   font-weight: 500;

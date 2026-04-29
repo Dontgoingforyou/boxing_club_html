@@ -8,7 +8,16 @@
 
   function formatRub(num) {
     var n = Math.round(Number(num)) || 0;
-    return n.toLocaleString("ru-RU") + " ₽";
+    return n.toLocaleString("ru-RU") + "\u00a0₽";
+  }
+
+  function formatRubHtml(num) {
+    var n = Math.round(Number(num)) || 0;
+    return (
+      '<span class="price-rub"><span class="price-rub__amount">' +
+      escapeHtml(n.toLocaleString("ru-RU")) +
+      '</span><span class="price-rub__currency">₽</span></span>'
+    );
   }
 
   function sizeLabel(size) {
@@ -42,6 +51,48 @@
     if (!el) return;
     el.textContent = message || "";
     el.hidden = !message;
+  }
+
+  function phoneDigits(value) {
+    return String(value || "").replace(/\D/g, "");
+  }
+
+  function normalizePhoneDisplay(value) {
+    var d = phoneDigits(value);
+    if (d.charAt(0) === "8") {
+      d = "7" + d.slice(1);
+    }
+    if (!d.length) {
+      return "+7";
+    }
+    if (d.charAt(0) !== "7") {
+      d = "7" + d.replace(/^7+/, "");
+    }
+    if (d.length > 11) {
+      d = d.slice(0, 11);
+    }
+    return "+7" + (d.length > 1 ? " " + d.slice(1) : "");
+  }
+
+  function bindCheckoutPhoneMask() {
+    var phone = document.getElementById("checkout-phone");
+    if (!phone || phone._cbcPhoneMaskBound) return;
+    phone._cbcPhoneMaskBound = true;
+    phone.addEventListener("focus", function () {
+      var v = String(phone.value || "").trim();
+      if (!v) {
+        phone.value = "+7 ";
+      }
+    });
+    phone.addEventListener("input", function () {
+      phone.value = normalizePhoneDisplay(phone.value);
+    });
+    phone.addEventListener("blur", function () {
+      var t = String(phone.value || "").trim();
+      if (t === "+7" || t === "+7 ") {
+        phone.value = "";
+      }
+    });
   }
 
   function clearErrors(form) {
@@ -86,7 +137,7 @@
         "</span>" +
         "</div>" +
         '<span class="checkout-summary-line__price">' +
-        escapeHtml(formatRub(line)) +
+        formatRubHtml(line) +
         "</span>" +
         "</div>";
     });
@@ -127,7 +178,13 @@
     ];
     map.forEach(function (pair) {
       var el = document.getElementById(pair[0]);
-      if (el && p[pair[1]]) el.value = String(p[pair[1]]);
+      if (el && p[pair[1]]) {
+        if (pair[0] === "checkout-phone") {
+          el.value = normalizePhoneDisplay(String(p[pair[1]]));
+        } else {
+          el.value = String(p[pair[1]]);
+        }
+      }
     });
   }
 
@@ -151,9 +208,15 @@
         ok = false;
       }
     }
-    if (phone && String(phone.value).replace(/\D/g, "").length < 10) {
-      showFormError(document.getElementById("err-phone"), "Укажите телефон (не меньше 10 цифр).");
-      ok = false;
+    if (phone) {
+      var pd = phoneDigits(phone.value);
+      if (pd.length < 11) {
+        showFormError(
+          document.getElementById("err-phone"),
+          "Укажите телефон: 10 цифр после кода +7."
+        );
+        ok = false;
+      }
     }
 
     var courierRadio = document.querySelector('input[name="checkout-delivery"][value="courier"]');
@@ -292,6 +355,7 @@
     mainEl.hidden = false;
 
     prefillFromProfile();
+    bindCheckoutPhoneMask();
     renderSummary();
     toggleDeliveryFields();
 
@@ -316,6 +380,7 @@
   document.addEventListener("cbc:partials-ready", function () {
     if (w.CBCCart && w.CBCCart.refreshNav) w.CBCCart.refreshNav();
     renderSummary();
+    bindCheckoutPhoneMask();
     var emptyEl = document.getElementById("checkout-empty");
     var mainEl = document.getElementById("checkout-main");
     if (w.CBCCart && w.CBCCart.count() === 0) {

@@ -92,6 +92,21 @@
     el.hidden = !msg;
   }
 
+  function initPasswordToggles() {
+    document.querySelectorAll(".password-field").forEach(function (wrap) {
+      var input = wrap.querySelector("input[type=\"password\"], input[type=\"text\"]");
+      var btn = wrap.querySelector(".password-field__toggle");
+      if (!input || !btn || btn._cbcPwToggle) return;
+      btn._cbcPwToggle = true;
+      btn.addEventListener("click", function () {
+        var showChars = input.type === "password";
+        input.type = showChars ? "text" : "password";
+        btn.setAttribute("aria-pressed", showChars ? "true" : "false");
+        btn.setAttribute("aria-label", showChars ? "Скрыть пароль" : "Показать пароль");
+      });
+    });
+  }
+
   function initLoginForm() {
     var form = document.getElementById("login-form");
     if (!form) return;
@@ -175,6 +190,7 @@
     bindLogoutClicks();
     refreshAccountLinks();
     markAccountNav();
+    initPasswordToggles();
     initLoginForm();
     initRegisterForm();
     initPasswordResetForm();
@@ -200,5 +216,6 @@
   document.addEventListener("cbc:partials-ready", function () {
     refreshAccountLinks();
     markAccountNav();
+    initPasswordToggles();
   });
 })(window);

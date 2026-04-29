@@ -190,9 +190,11 @@
 
   var CATALOG_HOVER_IMAGE_INDEX = 1;
 
-  function setupCatalogCardImageHover() {
+  function setupCatalogCardImageHover(root) {
     if (!window.CBC_PRODUCTS) return;
-    document.querySelectorAll(".product-card").forEach(function (card) {
+    var base = root && root.nodeType === 1 ? root : document;
+    base.querySelectorAll(".product-card").forEach(function (card) {
+      if (card.getAttribute("data-catalog-hover-bound") === "1") return;
       var media = card.querySelector(".product-card__media");
       var img = card.querySelector(".product-card__img");
       if (!media || !img || media.classList.contains("placeholder-checker")) return;
@@ -212,8 +214,11 @@
       card.addEventListener("mouseleave", function () {
         img.src = defaultSrc;
       });
+      card.setAttribute("data-catalog-hover-bound", "1");
     });
   }
+
+  window.CBCSetupCatalogCardHover = setupCatalogCardImageHover;
 
   setupCatalogCardImageHover();
 

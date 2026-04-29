@@ -189,6 +189,29 @@
     return wrap;
   }
 
+  function widestContentContainer() {
+    var nodes = doc.querySelectorAll("main .container--wide, main .container, .container--wide, .container");
+    var best = null;
+    var bestW = 0;
+    for (var i = 0; i < nodes.length; i++) {
+      var w = nodes[i].getBoundingClientRect().width;
+      if (w > bestW) {
+        bestW = w;
+        best = nodes[i];
+      }
+    }
+    return best;
+  }
+
+  function contentRightInsetPx(vw) {
+    var container = widestContentContainer();
+    if (container) {
+      var cr = container.getBoundingClientRect();
+      return Math.max(12, Math.round(vw - cr.right));
+    }
+    return Math.min(64, Math.max(12, Math.round(vw * 0.05)));
+  }
+
   function positionSearchDropdown() {
     var btn = doc.getElementById("nav-search");
     var panel = doc.querySelector("#cbc-search-overlay .search-overlay__panel");
@@ -201,11 +224,16 @@
       panel.style.right = "12px";
       panel.style.left = "12px";
       panel.style.width = "auto";
+      panel.style.maxWidth = "";
     } else {
+      var inset = contentRightInsetPx(vw);
+      var leftMin = 12;
+      var maxFit = Math.max(0, vw - inset - leftMin);
       panel.style.top = r.bottom + gap + "px";
-      panel.style.right = Math.max(12, vw - r.right) + "px";
+      panel.style.right = inset + "px";
       panel.style.left = "auto";
-      panel.style.width = "min(420px, calc(100vw - 24px))";
+      panel.style.width = "540px";
+      panel.style.maxWidth = maxFit + "px";
     }
   }
 
@@ -238,10 +266,15 @@
     var box = doc.getElementById("cbc-search-results");
     var link = doc.getElementById("cbc-search-open-page");
     if (!box) return;
-    var items = searchProducts(query);
-    box.innerHTML = query.trim() ? renderResultsHtml(items) : '<p class="search-overlay__empty">Введите запрос.</p>';
+    var q = String(query || "").trim();
+    if (!q) {
+      box.innerHTML = "";
+    } else {
+      var items = searchProducts(query);
+      box.innerHTML = renderResultsHtml(items);
+    }
     if (link) {
-      link.setAttribute("href", searchPageHref(query.trim()));
+      link.setAttribute("href", searchPageHref(q));
     }
   }
 
@@ -298,6 +331,8 @@
     );
   }
 
+  var searchPageDebounceTimer;
+
   function initSearchPage() {
     var form = doc.getElementById("search-page-form");
     var input = doc.getElementById("search-page-input");
@@ -305,15 +340,20 @@
     var empty = doc.getElementById("search-page-empty");
     if (!form || !input || !grid) return;
 
+    function syncUrlFromInput() {
+      var q = String(input.value || "").trim();
+      var url = searchPageHref(q);
+      if (url !== w.location.pathname + w.location.search) {
+        w.history.replaceState({}, "", url);
+      }
+    }
+
     function run() {
       var q = String(input.value || "").trim();
       if (!q) {
         grid.innerHTML = "";
         grid.hidden = true;
-        if (empty) {
-          empty.textContent = "Введите запрос и нажмите «Найти».";
-          empty.hidden = false;
-        }
+        if (empty) empty.hidden = true;
         return;
       }
       var items = searchProducts(q);
@@ -323,19 +363,30 @@
         empty.textContent = "По запросу ничего не найдено.";
       }
       grid.hidden = items.length === 0;
+      if (w.CBCSetupCatalogCardHover) w.CBCSetupCatalogCardHover(grid);
+    }
+
+    function scheduleRun() {
+      w.clearTimeout(searchPageDebounceTimer);
+      searchPageDebounceTimer = w.setTimeout(function () {
+        syncUrlFromInput();
+        run();
+      }, 200);
     }
 
     var params = new URLSearchParams(w.location.search);
     var initial = params.get("q");
     if (initial) input.value = initial;
 
+    input.addEventListener("input", scheduleRun);
+    input.addEventListener("paste", function () {
+      w.setTimeout(scheduleRun, 0);
+    });
+
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      var q = input.value.trim();
-      var url = searchPageHref(q);
-      if (url !== w.location.pathname + w.location.search) {
-        w.history.replaceState({}, "", url);
-      }
+      syncUrlFromInput();
+      w.clearTimeout(searchPageDebounceTimer);
       run();
     });
 

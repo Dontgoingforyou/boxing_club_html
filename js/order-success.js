@@ -3,7 +3,7 @@
 
   function formatRub(num) {
     var n = Math.round(Number(num)) || 0;
-    return n.toLocaleString("ru-RU") + " ₽";
+    return n.toLocaleString("ru-RU") + "\u00a0₽";
   }
 
   function findOrder(id) {
