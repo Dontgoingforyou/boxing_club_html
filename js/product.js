@@ -100,12 +100,15 @@
   if (input && minus && plus) {
     minus.addEventListener("click", function () {
       input.value = clampQty(Number(input.value) - 1);
+      syncCartButton();
     });
     plus.addEventListener("click", function () {
       input.value = clampQty(Number(input.value) + 1);
+      syncCartButton();
     });
     input.addEventListener("change", function () {
       input.value = clampQty(input.value);
+      syncCartButton();
     });
   }
 
@@ -159,20 +162,12 @@
       addToCart.setAttribute("data-in-cart", "true");
       addToCart.classList.add("is-in-cart");
       if (addLabel) addLabel.textContent = labelAdded;
-      var lineQty = 0;
-      window.CBCCart.getItems().forEach(function (row) {
-        if (
-          row.id === productId &&
-          String(row.size).toLowerCase() === String(getSelectedSize()).toLowerCase()
-        ) {
-          lineQty = row.qty;
-        }
-      });
+      var inputQty = input ? clampQty(input.value) : 1;
       if (addCount) {
-        addCount.textContent = String(lineQty);
+        addCount.textContent = String(inputQty);
         addCount.hidden = false;
       }
-      addToCart.setAttribute("aria-label", labelAdded + ", количество: " + lineQty);
+      addToCart.setAttribute("aria-label", labelAdded + ", количество: " + inputQty);
     } else {
       addToCart.setAttribute("data-in-cart", "false");
       addToCart.classList.remove("is-in-cart");
@@ -272,6 +267,7 @@
     if (mainTrack) {
       mainTrack.style.transition = "none";
       mainTrack.style.transform = "translateX(0)";
+      mainTrack.style.willChange = "auto";
       void mainTrack.offsetWidth;
       mainTrack.style.transition = "";
     }
@@ -355,6 +351,7 @@
 
     function runSlideAfterLoad() {
       if (token !== gallerySwapSeq) return;
+      if (mainTrack) mainTrack.style.willChange = "transform";
       mainTrack._cbcSlideEnd = onTrackEnd;
       mainTrack.addEventListener("transitionend", onTrackEnd);
       requestAnimationFrame(function () {

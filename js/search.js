@@ -18,6 +18,11 @@
     return /\/account(\/|$)/.test(w.location.pathname || "") ? "../" : "";
   }
 
+  function resolveImgUrl(img) {
+    if (!img || /^(https?:)?\/\//.test(img) || img.charAt(0) === "/") return img;
+    return pathPrefix() + img;
+  }
+
   function escapeHtml(s) {
     if (s == null) return "";
     return String(s)
@@ -194,7 +199,7 @@
         '">' +
         (item.img
           ? '<span class="search-overlay__thumb-wrap"><img src="' +
-            escapeHtml(item.img) +
+            escapeHtml(resolveImgUrl(item.img)) +
             '" alt="" class="search-overlay__thumb" width="56" height="88" loading="lazy" /></span>'
           : '<span class="search-overlay__thumb-wrap search-overlay__thumb-wrap--empty" aria-hidden="true"></span>') +
         '<span class="search-overlay__meta">' +
@@ -232,7 +237,7 @@
       if (img) {
         html +=
           '<img src="' +
-          escapeHtml(img) +
+          escapeHtml(resolveImgUrl(img)) +
           '" alt="' +
           alt +
           '" width="620" height="968" class="product-card__img" loading="lazy" />';
@@ -294,7 +299,7 @@
         '<div class="search-overlay__pop-img-wrap">' +
         (img
           ? '<img class="search-overlay__pop-img" src="' +
-            escapeHtml(img) +
+            escapeHtml(resolveImgUrl(img)) +
             '" alt="" width="200" height="312" loading="lazy" />'
           : "") +
         "</div>" +
@@ -444,7 +449,7 @@
     if (!btn || !panel) return;
     var gap = 8;
     var r = btn.getBoundingClientRect();
-    var pad = 12;
+    var pad = 64;
     panel.style.top = r.bottom + gap + "px";
     panel.style.left = pad + "px";
     panel.style.right = pad + "px";

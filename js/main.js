@@ -33,6 +33,7 @@
     function setDrawerOpen(open, instant) {
       if (!drawer || !menuBtn) return;
       var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var dPanel = drawer.querySelector(".drawer__panel");
       if (open) {
         drawer.hidden = false;
         menuBtn.setAttribute("aria-expanded", "true");
@@ -41,6 +42,7 @@
           drawer.classList.add("drawer--open");
           return;
         }
+        if (dPanel) dPanel.style.willChange = "transform";
         window.requestAnimationFrame(function () {
           window.requestAnimationFrame(function () {
             drawer.classList.add("drawer--open");
@@ -54,8 +56,8 @@
           window.CBCSyncBodyScrollLock();
           return;
         }
+        if (dPanel) dPanel.style.willChange = "transform";
         drawer.classList.remove("drawer--open");
-        var dPanel = drawer.querySelector(".drawer__panel");
         if (!dPanel) {
           drawer.hidden = true;
           window.CBCSyncBodyScrollLock();
@@ -63,6 +65,7 @@
         }
         var fallbackTimer = window.setTimeout(function () {
           dPanel.removeEventListener("transitionend", onDrawerEnd);
+          dPanel.style.willChange = "auto";
           if (!drawer.hidden) {
             drawer.hidden = true;
           }
@@ -72,6 +75,7 @@
           if (e.target !== dPanel || !isTransformTransitionEnd(e)) return;
           window.clearTimeout(fallbackTimer);
           dPanel.removeEventListener("transitionend", onDrawerEnd);
+          dPanel.style.willChange = "auto";
           drawer.hidden = true;
           window.CBCSyncBodyScrollLock();
         }
@@ -110,6 +114,7 @@
         window.CBCSyncBodyScrollLock();
       }
 
+      var panel = cartDrawer.querySelector(".cart-drawer__panel");
       if (open) {
         if (drawer && !drawer.hidden) {
           setDrawerOpen(false, true);
@@ -123,6 +128,7 @@
           cartDrawer.classList.add("cart-drawer--open");
           return;
         }
+        if (panel) panel.style.willChange = "transform";
         window.requestAnimationFrame(function () {
           window.requestAnimationFrame(function () {
             cartDrawer.classList.add("cart-drawer--open");
@@ -140,8 +146,8 @@
           afterCartClosed();
           return;
         }
+        if (panel) panel.style.willChange = "transform";
         cartDrawer.classList.remove("cart-drawer--open");
-        var panel = cartDrawer.querySelector(".cart-drawer__panel");
         if (!panel) {
           cartDrawer.hidden = true;
           afterCartClosed();
@@ -149,6 +155,7 @@
         }
         var fallbackCart = window.setTimeout(function () {
           panel.removeEventListener("transitionend", onCartEnd);
+          panel.style.willChange = "auto";
           if (!cartDrawer.hidden) {
             cartDrawer.hidden = true;
           }
@@ -158,6 +165,7 @@
           if (e.target !== panel || !isTransformTransitionEnd(e)) return;
           window.clearTimeout(fallbackCart);
           panel.removeEventListener("transitionend", onCartEnd);
+          panel.style.willChange = "auto";
           cartDrawer.hidden = true;
           afterCartClosed();
         }

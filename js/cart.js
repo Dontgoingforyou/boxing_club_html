@@ -365,22 +365,22 @@
         var lineSum = unitRub * (row.qty || 0);
         var isPending = pendingRemoval && lineEqual(pendingRemoval.snapshot, row);
         var removeBlock = "";
+        var pendingInfoBlock = "";
         if (isPending) {
           var secLeft = pendingRemoval
             ? Math.max(0, Math.ceil((pendingRemoval.endsAt - Date.now()) / 1000))
             : 5;
-          removeBlock =
-            '<div class="cart-pending-remove cart-drawer__line-remove">' +
+          pendingInfoBlock =
+            '<div class="cart-pending-remove">' +
             '<span class="cart-pending-remove__msg">Удалим через <strong id="cart-remove-countdown">' +
             escapeHtml(String(secLeft)) +
             '</strong> с</span>' +
-            '<button type="button" class="cart-remove-undo link-more" data-undo-remove>Отменить</button>' +
+            '<button type="button" class="cart-remove-undo" data-undo-remove>Отменить</button>' +
             "</div>";
         } else {
           removeBlock =
             '<button type="button" class="cart-remove-link" data-remove-line aria-label="Удалить позицию">' +
             REMOVE_ICON_SVG +
-            "<span>Удалить</span>" +
             "</button>";
         }
 
@@ -437,13 +437,12 @@
           qtyDisabled +
           ">+</button>" +
           "</div>" +
+          removeBlock +
           '<span class="cart-drawer__line-price">' +
           formatRubHtml(lineSum) +
           "</span>" +
           "</div>" +
-          '<div class="cart-drawer__line-remove">' +
-          removeBlock +
-          "</div>" +
+          pendingInfoBlock +
           "</div>" +
           "</article>";
       });
