@@ -28,6 +28,8 @@ html {
   --bookmark-icon-fill: var(--accent);
   /* трекинг для капса: 0.03em на мелком кегле почти незаметен, усилено для читаемого эффекта */
   --letter-spacing-caps: 0.03em;
+  /* Единая высота чипов категорий и селекта сортировки в блоке каталога */
+  --catalog-toolbar-h: 48px;
 }
 
 .text-caps-track {
@@ -484,11 +486,10 @@ body.page-login .page--auth {
 
 .search-page-empty {
   margin: 0 0 24px;
-  padding: 20px;
-  border-radius: var(--radius-card);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0;
   color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.45;
 }
 
 .search-page-empty[hidden] {
@@ -3269,12 +3270,14 @@ button {
 
 .catalog-sort {
   min-width: min(100vw - 2.5rem, 280px);
-  min-height: 48px;
+  height: var(--catalog-toolbar-h);
+  min-height: var(--catalog-toolbar-h);
   box-sizing: border-box;
-  padding: 12px 40px 12px 14px;
+  padding: 0 40px 0 14px;
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
+  line-height: 1;
   color: var(--text);
   cursor: pointer;
   color-scheme: dark;
@@ -3297,12 +3300,16 @@ button {
   border-color: var(--accent);
 }
 
-.catalog__toolbar .filter-chip {
+.catalog .catalog__filters .filter-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
+  height: var(--catalog-toolbar-h);
+  min-height: var(--catalog-toolbar-h);
   box-sizing: border-box;
+  padding: 0 14px;
+  font-size: 15px;
+  line-height: 1.2;
 }
 
 .catalog__more--cta {
