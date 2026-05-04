@@ -1,4 +1,114 @@
 (function (w) {
+  var CHECKOUT_DRAFT_KEY = "cbc_checkout_draft";
+  var CHECKOUT_DRAFT_VERSION = 1;
+  var draftSaveTimer = null;
+
+  function readCheckoutDraftRaw() {
+    try {
+      var raw = w.localStorage.getItem(CHECKOUT_DRAFT_KEY);
+      if (!raw) return null;
+      var o = JSON.parse(raw);
+      if (!o || typeof o !== "object") return null;
+      return o;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function writeCheckoutDraftRaw(data) {
+    try {
+      w.localStorage.setItem(CHECKOUT_DRAFT_KEY, JSON.stringify(data));
+    } catch (e) {}
+  }
+
+  function clearCheckoutDraft() {
+    try {
+      w.localStorage.removeItem(CHECKOUT_DRAFT_KEY);
+    } catch (e) {}
+  }
+
+  function valById(id) {
+    var el = document.getElementById(id);
+    return el ? String(el.value || "") : "";
+  }
+
+  function collectCheckoutFields() {
+    var deliveryEl = document.querySelector('input[name="checkout-delivery"]:checked');
+    var paymentEl = document.querySelector('input[name="checkout-payment"]:checked');
+    return {
+      v: CHECKOUT_DRAFT_VERSION,
+      name: valById("checkout-name"),
+      email: valById("checkout-email"),
+      phone: valById("checkout-phone"),
+      city: valById("checkout-city"),
+      street: valById("checkout-street"),
+      house: valById("checkout-house"),
+      apt: valById("checkout-apt"),
+      zip: valById("checkout-zip"),
+      delivery: deliveryEl ? deliveryEl.value : "courier",
+      payment: paymentEl ? paymentEl.value : "card",
+      pickup: valById("checkout-pickup"),
+    };
+  }
+
+  function scheduleCheckoutDraftSave() {
+    var step = document.getElementById("cart-drawer-step-checkout");
+    if (!step || step.hidden) return;
+    w.clearTimeout(draftSaveTimer);
+    draftSaveTimer = w.setTimeout(function () {
+      var data = collectCheckoutFields();
+      data.inCheckout = true;
+      data.v = CHECKOUT_DRAFT_VERSION;
+      writeCheckoutDraftRaw(data);
+    }, 280);
+  }
+
+  function bindCheckoutDraftPersistenceOnce() {
+    var form = document.getElementById("checkout-form");
+    if (!form || form._cbcCheckoutDraftBound) return;
+    form._cbcCheckoutDraftBound = true;
+    form.addEventListener("input", scheduleCheckoutDraftSave);
+    form.addEventListener("change", scheduleCheckoutDraftSave);
+  }
+
+  function applyCheckoutDraftOverProfile() {
+    var d = readCheckoutDraftRaw();
+    if (!d || d.v !== CHECKOUT_DRAFT_VERSION) return;
+
+    function setInput(id, value) {
+      if (value === undefined) return;
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (id === "checkout-phone") {
+        el.value = value === "" ? "" : normalizePhoneDisplay(String(value));
+      } else {
+        el.value = String(value);
+      }
+    }
+
+    if (Object.prototype.hasOwnProperty.call(d, "name")) setInput("checkout-name", d.name);
+    if (Object.prototype.hasOwnProperty.call(d, "email")) setInput("checkout-email", d.email);
+    if (Object.prototype.hasOwnProperty.call(d, "phone")) setInput("checkout-phone", d.phone);
+    if (Object.prototype.hasOwnProperty.call(d, "city")) setInput("checkout-city", d.city);
+    if (Object.prototype.hasOwnProperty.call(d, "street")) setInput("checkout-street", d.street);
+    if (Object.prototype.hasOwnProperty.call(d, "house")) setInput("checkout-house", d.house);
+    if (Object.prototype.hasOwnProperty.call(d, "apt")) setInput("checkout-apt", d.apt);
+    if (Object.prototype.hasOwnProperty.call(d, "zip")) setInput("checkout-zip", d.zip);
+
+    if (d.delivery === "courier" || d.delivery === "pickup") {
+      var rd = document.querySelector('input[name="checkout-delivery"][value="' + d.delivery + '"]');
+      if (rd) rd.checked = true;
+    }
+    if (d.payment === "card" || d.payment === "cod") {
+      var rp = document.querySelector('input[name="checkout-payment"][value="' + d.payment + '"]');
+      if (rp) rp.checked = true;
+    }
+    if (Object.prototype.hasOwnProperty.call(d, "pickup") && String(d.pickup).length) {
+      var sel = document.getElementById("checkout-pickup");
+      if (sel) sel.value = String(d.pickup);
+    }
+  }
+
   function parsePriceRub(text) {
     if (text == null) return 0;
     var digits = String(text).replace(/[^\d]/g, "");
@@ -328,6 +438,8 @@
 
     if (w.CBCOrders && w.CBCOrders.push) w.CBCOrders.push(order);
 
+    clearCheckoutDraft();
+
     setProfile({
       name: contact.name,
       email: contact.email,
@@ -354,10 +466,37 @@
     document.querySelectorAll('input[name="checkout-delivery"]').forEach(function (r) {
       r.addEventListener("change", toggleDeliveryFields);
     });
+
+    bindCheckoutDraftPersistenceOnce();
   }
+
+  w.CBCCheckoutDraft = {
+    shouldResumeCheckoutStep: function () {
+      if (!w.CBCCart || w.CBCCart.count() === 0) return false;
+      var d = readCheckoutDraftRaw();
+      return !!(d && d.v === CHECKOUT_DRAFT_VERSION && d.inCheckout === true);
+    },
+    markEnteringCheckout: function () {
+      var data = collectCheckoutFields();
+      data.inCheckout = true;
+      data.v = CHECKOUT_DRAFT_VERSION;
+      writeCheckoutDraftRaw(data);
+    },
+    markLeavingCheckoutUi: function () {
+      var data = collectCheckoutFields();
+      data.inCheckout = false;
+      data.v = CHECKOUT_DRAFT_VERSION;
+      writeCheckoutDraftRaw(data);
+    },
+    clear: clearCheckoutDraft,
+    clearIfCartEmpty: function () {
+      if (!w.CBCCart || w.CBCCart.count() === 0) clearCheckoutDraft();
+    },
+  };
 
   w.CBCCheckoutOnDrawerStep = function () {
     prefillFromProfile();
+    applyCheckoutDraftOverProfile();
     bindCheckoutPhoneMask();
     renderSummary();
     toggleDeliveryFields();

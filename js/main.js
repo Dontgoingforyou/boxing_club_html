@@ -103,6 +103,9 @@
       if (window.CBCCheckoutOnDrawerStep) {
         window.CBCCheckoutOnDrawerStep();
       }
+      if (window.CBCCheckoutDraft && window.CBCCheckoutDraft.markEnteringCheckout) {
+        window.CBCCheckoutDraft.markEnteringCheckout();
+      }
     }
 
     function setCartDrawerOpen(open, instant) {
@@ -122,8 +125,12 @@
         cartDrawer.hidden = false;
         navCart.setAttribute("aria-expanded", "true");
         window.CBCSyncBodyScrollLock();
-        showCartStep();
         if (window.CBCCart) window.CBCCart.render();
+        if (window.CBCCheckoutDraft && window.CBCCheckoutDraft.shouldResumeCheckoutStep()) {
+          showCheckoutStep();
+        } else {
+          showCartStep();
+        }
         if (instant || reduceMotion) {
           cartDrawer.classList.add("cart-drawer--open");
           return;
@@ -219,6 +226,9 @@
       }
       if (btnBackCart) {
         btnBackCart.addEventListener("click", function () {
+          if (window.CBCCheckoutDraft && window.CBCCheckoutDraft.markLeavingCheckoutUi) {
+            window.CBCCheckoutDraft.markLeavingCheckoutUi();
+          }
           showCartStep();
         });
       }

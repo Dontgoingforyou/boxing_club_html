@@ -2,7 +2,7 @@
   var CBC_SEARCH = {
     HISTORY_KEY: "cbc_search_history",
     HISTORY_MAX: 10,
-    SUGGESTION_TAGS: ["футболка", "худи", "белый", "перчатки", "шорты", "костюмы"],
+    SUGGESTION_TAGS: ["футболка", "худи", "белый", "перчатки", "шорты"],
     TRENDING: ["футболка", "худи", "перчатки", "костюмы"],
     POPULAR_IDS: ["tee-1", "tee-2", "tee-3", "tee-4"],
     STORE_BRAND: "California Boxing Club",
@@ -169,22 +169,6 @@
     }
   }
 
-  function uniqueCategoriesFromProducts() {
-    var products = w.CBC_PRODUCTS || {};
-    var set = {};
-    Object.keys(products).forEach(function (id) {
-      var c = products[id] && products[id].category;
-      if (c) set[c] = true;
-    });
-    return Object.keys(set).sort(function (a, b) {
-      return a.localeCompare(b, "ru");
-    });
-  }
-
-  function categoryTagsFromData() {
-    return uniqueCategoriesFromProducts().slice(0, 6);
-  }
-
   function renderResultsHtml(items) {
     if (!items.length) {
       return '<p class="search-overlay__empty">Ничего не найдено. Попробуйте другие слова.</p>';
@@ -262,7 +246,7 @@
   function renderOverlayHistoryList() {
     var items = readHistory();
     if (!items.length) {
-      return '<p class="search-overlay__empty" style="margin:0;font-size:14px">Пока пусто</p>';
+      return '<p class="search-overlay__history-empty">Пока пусто</p>';
     }
     var html = '<ul class="search-overlay__mini-list" role="list">';
     items.forEach(function (q) {
@@ -322,12 +306,6 @@
     var merged = [];
     var seen = {};
     CBC_SEARCH.SUGGESTION_TAGS.forEach(function (t) {
-      if (!seen[t]) {
-        seen[t] = true;
-        merged.push(t);
-      }
-    });
-    categoryTagsFromData().forEach(function (t) {
       if (!seen[t]) {
         seen[t] = true;
         merged.push(t);
@@ -396,7 +374,7 @@
       overlayLupeSvg() +
       '<input type="search" id="cbc-search-input" name="q" class="search-overlay__input-inner" autocomplete="off" placeholder="Название, категория, цвет…" />' +
       "</div>" +
-      '<button type="submit" class="btn btn--accent search-overlay__submit" id="cbc-search-submit">Найти</button>' +
+      '<button type="submit" class="btn btn--ghost search-overlay__submit" id="cbc-search-submit">Найти</button>' +
       "</form>" +
       '<div id="cbc-search-tags" class="search-overlay__tags" aria-label="Быстрые подсказки"></div>' +
       '<div class="search-overlay__results-wrap">' +

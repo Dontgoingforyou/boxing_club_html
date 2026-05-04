@@ -420,6 +420,7 @@
           escapeHtml(priceText) +
           "</p>" +
           '<div class="cart-drawer__line-row">' +
+          '<div class="cart-drawer__line-actions">' +
           '<div class="product-qty product-qty--sm"' +
           (isPending ? " data-qty-blocked" : "") +
           ' data-line-qty' +
@@ -438,6 +439,7 @@
           ">+</button>" +
           "</div>" +
           removeBlock +
+          "</div>" +
           '<span class="cart-drawer__line-price">' +
           formatRubHtml(lineSum) +
           "</span>" +
@@ -458,6 +460,10 @@
 
       var toCheckout = document.getElementById("cart-drawer-to-checkout");
       if (toCheckout) toCheckout.hidden = isEmpty;
+
+      if (isEmpty && w.CBCCheckoutDraft && w.CBCCheckoutDraft.clearIfCartEmpty) {
+        w.CBCCheckoutDraft.clearIfCartEmpty();
+      }
     },
   };
 
