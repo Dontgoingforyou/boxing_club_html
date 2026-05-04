@@ -374,7 +374,7 @@
       overlayLupeSvg() +
       '<input type="search" id="cbc-search-input" name="q" class="search-overlay__input-inner" autocomplete="off" placeholder="Название, категория, цвет…" />' +
       "</div>" +
-      '<button type="submit" class="btn btn--ghost search-overlay__submit" id="cbc-search-submit">Найти</button>' +
+      '<button type="submit" class="btn btn--accent search-overlay__submit" id="cbc-search-submit">Найти</button>' +
       "</form>" +
       '<div id="cbc-search-tags" class="search-overlay__tags" aria-label="Быстрые подсказки"></div>' +
       '<div class="search-overlay__results-wrap">' +

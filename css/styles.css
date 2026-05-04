@@ -19,8 +19,9 @@ html {
   --font-display: "Montserrat", system-ui, sans-serif;
   --font-heading: "Inter Tight", system-ui, sans-serif;
   --radius-pill: 999px;
+  /* Единый радиус «плашек» и прямоугольных кнопок (hero CTA, фильтры, поиск, инпуты) */
   --radius-card: 6px;
-  --radius-btn: 12px;
+  --radius-btn: var(--radius-card);
   /* отступ контента под «плавающую» шапку: отступ сверху + внутренние поля + ряд иконок */
   --top-bar-h: 88px;
   /* цвет залитой иконки «избранное» (можно менять под фото товара) */
@@ -169,7 +170,7 @@ html {
   color: var(--text);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   outline: none;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
@@ -349,7 +350,7 @@ body.page-login .page--auth {
   margin: 0;
   padding: 0;
   border: none;
-  border-radius: 0 12px 12px 0;
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
@@ -457,6 +458,14 @@ body.page-login .page--auth {
   margin-bottom: 10px;
 }
 
+.search-page-toolbar__label.checkout-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
 .search-page-toolbar__row {
   display: flex;
   flex-wrap: wrap;
@@ -476,7 +485,7 @@ body.page-login .page--auth {
 .search-page-empty {
   margin: 0 0 24px;
   padding: 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text-muted);
@@ -560,9 +569,10 @@ body.page-login .page--auth {
   flex-shrink: 0;
   box-sizing: border-box;
   min-width: min(240px, 100%);
+  border-radius: var(--radius-card);
 }
 
-.search-page__search-row .btn--ghost.search-page-submit--caps {
+.search-page__search-row .btn--accent.search-page-submit--caps {
   min-height: 48px;
   padding: 12px 26px;
   font-size: 14px;
@@ -574,6 +584,7 @@ body.page-login .page--auth {
   flex-shrink: 0;
   min-width: min(220px, 100%);
   box-sizing: border-box;
+  border-radius: var(--radius-card);
 }
 
 .search-page-summary {
@@ -607,8 +618,10 @@ body.page-login .page--auth {
 }
 
 .search-page-refine__label {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--text-muted);
 }
 
@@ -622,7 +635,7 @@ body.page-login .page--auth {
   color: var(--text);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   cursor: pointer;
   font-family: inherit;
   transition: border-color 0.2s;
@@ -985,7 +998,7 @@ html.search-overlay-active body {
   color: var(--text-muted);
 }
 
-.search-overlay__search-row .btn--ghost.search-overlay__submit {
+.search-overlay__search-row .btn--accent.search-overlay__submit {
   width: auto;
   max-width: none;
   flex-shrink: 0;
@@ -996,11 +1009,13 @@ html.search-overlay-active body {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  color: #fff;
   box-sizing: border-box;
+  border-radius: var(--radius-card);
 }
 
-.search-overlay__search-row .btn--ghost.search-overlay__submit:hover {
-  color: var(--text);
+.search-overlay__search-row .btn--accent.search-overlay__submit:hover {
+  color: #fff;
 }
 
 .search-overlay__tags {
@@ -1017,7 +1032,7 @@ html.search-overlay-active body {
   color: var(--text);
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   cursor: pointer;
   font-family: inherit;
   transition: border-color 0.2s, color 0.2s;
@@ -1149,7 +1164,7 @@ html.search-overlay-active body {
   color: var(--text);
   background: transparent;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   cursor: pointer;
   font-family: inherit;
   transition: background 0.15s;
@@ -1213,7 +1228,7 @@ html.search-overlay-active body {
   min-width: 0;
   text-decoration: none;
   color: inherit;
-  border-radius: 14px;
+  border-radius: var(--radius-card);
   overflow: hidden;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1334,7 +1349,7 @@ html.search-overlay-active body {
   padding: 12px 6px;
   color: inherit;
   text-decoration: none;
-  border-radius: 10px;
+  border-radius: var(--radius-card);
   transition: background 0.15s ease;
 }
 
@@ -1346,7 +1361,7 @@ html.search-overlay-active body {
   flex-shrink: 0;
   width: 56px;
   height: 88px;
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   overflow: hidden;
   background: rgba(255, 255, 255, 0.06);
 }
@@ -1432,7 +1447,7 @@ html.search-overlay-active body {
 .account-nav__link {
   display: block;
   padding: 12px 14px;
-  border-radius: 10px;
+  border-radius: var(--radius-card);
   font-size: 15px;
   font-weight: 500;
   color: var(--text-muted);
@@ -1461,7 +1476,7 @@ html.search-overlay-active body {
   margin-top: 0;
   padding: 12px 14px 12px 6px;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-card);
   background: transparent;
   font: inherit;
   font-size: 15px;
@@ -1682,9 +1697,10 @@ html.search-overlay-active body {
 
 .order-detail-section__title {
   margin: 0 0 14px;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--text-muted);
 }
 
@@ -1699,7 +1715,7 @@ html.search-overlay-active body {
   flex-direction: column;
   gap: 0;
   padding: 16px;
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -1757,7 +1773,7 @@ html.search-overlay-active body {
 .order-detail-dl {
   margin: 0;
   padding: 16px;
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -1790,7 +1806,16 @@ html.search-overlay-active body {
 
 .order-detail-dl dt {
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.order-detail-dl__row--total dt {
+  font-size: 17px;
+  letter-spacing: 0.06em;
+  color: var(--text);
 }
 
 .order-detail-dl dd {
@@ -1837,8 +1862,11 @@ html.search-overlay-active body {
 
 .checkout-aside__title {
   margin: 0 0 20px;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .checkout-summary-line {
@@ -1957,7 +1985,7 @@ html.search-overlay-active body {
 .success-screen__meta {
   margin: 0 0 32px;
   padding: 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   text-align: left;
@@ -2141,7 +2169,7 @@ button {
   height: 44px;
   padding: 0;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   background: transparent;
   color: var(--text);
   cursor: pointer;
@@ -2326,7 +2354,7 @@ button {
   color: var(--text-muted);
   background: transparent;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   cursor: pointer;
   transition: color 0.15s ease, background 0.15s ease;
 }
@@ -2384,7 +2412,7 @@ button {
 
 .cart-drawer__line-thumb-wrap {
   display: block;
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   overflow: hidden;
   background: rgba(255, 255, 255, 0.04);
 }
@@ -2542,7 +2570,7 @@ button {
   top: auto;
   margin-bottom: 16px;
   padding: 14px;
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   z-index: auto;
@@ -2550,11 +2578,6 @@ button {
 
 .cart-drawer__checkout .checkout-aside__title {
   margin: 0 0 12px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
 }
 
 .cart-drawer__checkout .checkout-submit {
@@ -3121,7 +3144,7 @@ button {
 
 .cart-thumb-wrap {
   display: block;
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   overflow: hidden;
   background: rgba(255, 255, 255, 0.04);
 }
@@ -3398,7 +3421,7 @@ button {
   justify-content: center;
   padding: 0;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   background: transparent;
   color: var(--text);
   cursor: pointer;
